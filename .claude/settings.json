@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /Users/ludde/Desktop/huddinge-karta && git diff --quiet && git diff --staged --quiet || (git add -A && git commit -m 'Auto-save changes' && git push) 2>/dev/null || true",
+            "statusMessage": "Pushing to GitHub..."
+          }
+        ]
+      }
+    ]
+  }
+}
