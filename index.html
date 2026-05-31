@@ -30,6 +30,7 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
 #topChips{
   display:flex;gap:8px;overflow-x:auto;flex:1;min-width:0;
   scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  padding:6px 0;margin:-6px 0;
   -webkit-mask-image:linear-gradient(to right,black calc(100% - 32px),transparent 100%);
   mask-image:linear-gradient(to right,black calc(100% - 32px),transparent 100%);
 }
@@ -119,22 +120,25 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
 .ev-card{
   flex-shrink:0;width:min(320px,calc(100vw - 48px));
   background:#fff;
-  border-radius:32px 32px 40px 40px;
-  box-shadow:0 8px 8px rgba(0,0,0,.07),0 4px 4px rgba(0,0,0,.07);
+  border-radius:24px;
+  box-shadow:0 4px 8px -1px rgba(0,0,0,.03),0 8px 16px -2px rgba(0,0,0,.03);
   padding:8px;
   scroll-snap-align:start;cursor:pointer;
+  display:flex;flex-direction:column;
 }
-.ev-card-img{width:100%;height:128px;border-radius:24px;object-fit:cover;display:block;background:#e0e0e0}
-.ev-card-body{padding:12px 8px 8px}
+.ev-card-img{width:100%;height:128px;border-radius:16px;object-fit:cover;display:block;background:#e0e0e0;flex-shrink:0}
+.ev-card-body{padding:12px 8px 8px;flex:1;display:flex;flex-direction:column}
 .ev-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:14px}
-.ev-card-name{font-size:15px;font-weight:600;color:#000;line-height:1.2}
+.ev-card-name{font-size:15px;font-weight:500;color:#000;line-height:1.2}
 .ev-card-desc{font-size:13px;color:rgba(0,0,0,.7);margin-top:2px}
 .ev-card-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
 .ev-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:8px;font-size:13px;font-weight:500;background:rgba(0,0,0,.07);color:#000;white-space:nowrap}
 .ev-tag svg{width:14px;height:14px;opacity:.55;flex-shrink:0}
-.ev-card-btns{display:flex;gap:6px}
+.ev-card-btns{display:flex;gap:6px;margin-top:auto}
 .btn-ghost{flex:1;padding:16px 8px;border-radius:56px;background:rgba(70,70,70,.1);border:none;font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:#000;cursor:pointer;white-space:nowrap}
 .btn-dark{flex:1;padding:16px 8px;border-radius:56px;background:#000;border:none;font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:#fff;cursor:pointer;white-space:nowrap}
+/* Ensam knapp → full bredd */
+.ev-card-btns .btn-ghost:only-child,.ev-card-btns .btn-dark:only-child{flex:1}
 .free-badge{display:inline-flex;align-items:center;padding:4px 8px;border-radius:8px;font-size:13px;font-weight:600;background:rgba(52,199,89,.15);color:#1a7a38}
 
 /* ══ FLOATING TAB BAR ══ */
@@ -142,7 +146,7 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
   position:absolute;
   bottom:calc(env(safe-area-inset-bottom,0px) + 20px);
   left:50%;transform:translateX(-50%);
-  z-index:150;
+  z-index:350;
   display:flex;gap:8px;align-items:center;
   transition:transform .35s cubic-bezier(.32,.94,.6,1),opacity .35s;
 }
@@ -182,32 +186,52 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
 }
 #calendarView::-webkit-scrollbar{display:none}
 #calendarView.visible{transform:translateY(0)}
-.cal-header{
-  padding:calc(env(safe-area-inset-top,44px) + 16px) 16px 8px;
-  background:#f6f6f6;
+.cal-header{background:#f6f6f6}
+.cal-header-top{
+  display:flex;justify-content:flex-end;gap:8px;
+  padding:calc(env(safe-area-inset-top,44px) + 8px) 16px 0;
 }
-.cal-title{font-size:24px;font-weight:700;color:#000;margin-bottom:2px}
-.cal-sub{font-size:14px;color:rgba(0,0,0,.45)}
+.cal-header-main{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 16px 4px;
+}
+.cal-icon-wrap{
+  width:48px;height:48px;display:flex;align-items:center;justify-content:center;
+  border-radius:134px;flex-shrink:0;
+}
+.cal-icon-wrap svg{width:32px;height:32px}
+.cal-title{font-size:24px;font-weight:600;color:#000;line-height:1.2}
+.cal-sub{font-size:14px;font-weight:500;color:rgba(0,0,0,.6);margin-top:4px}
 .cal-chips{
-  display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:12px 16px 4px;
+  display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;
+  padding:8px 16px 12px;
 }
 .cal-chips::-webkit-scrollbar{display:none}
 .cal-section{padding:16px 0 0}
-.cal-section-title{font-size:20px;font-weight:700;color:#000;margin-bottom:12px;padding:0 16px}
-.cal-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px 8px;
+.cal-section-title{font-size:18px;font-weight:500;color:#000;margin-bottom:8px;padding:0 16px}
+.cal-h-scroll{
+  display:flex;gap:8px;overflow-x:auto;padding:4px 16px 16px;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
 }
+.cal-h-scroll::-webkit-scrollbar{display:none}
 .cal-card{
-  background:#fff;border-radius:16px;overflow:hidden;
-  box-shadow:0 2px 14px rgba(0,0,0,.10);cursor:pointer;transition:transform .15s;
+  flex-shrink:0;width:299px;background:#fff;
+  border-radius:24px;overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:0 4px 8px -1px rgba(0,0,0,.03),0 8px 16px -2px rgba(0,0,0,.03);
+  cursor:pointer;transition:transform .15s;
 }
 .cal-card:active{transform:scale(.97)}
-.cal-card-img{width:100%;height:130px;object-fit:cover;display:block;background:#e8e8e8}
-.cal-card-body{padding:10px 10px 12px}
-.cal-card-name{font-size:14px;font-weight:700;color:#000;line-height:1.2;margin-bottom:3px}
-.cal-card-desc{font-size:12px;color:rgba(0,0,0,.55);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:8px}
-.cal-card-tags{display:flex;gap:5px;flex-wrap:wrap}
-.cal-tag{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:500;background:rgba(0,0,0,.07);color:#000;white-space:nowrap}
+.cal-card-img{width:100%;height:128px;object-fit:cover;display:block;background:#e8e8e8;flex-shrink:0}
+.cal-card-body{padding:12px;flex:1;display:flex;flex-direction:column}
+.cal-card-name{font-size:15px;font-weight:500;color:#000;line-height:1.2;margin-bottom:2px}
+.cal-card-desc{font-size:13px;color:rgba(0,0,0,.7);margin-bottom:14px;flex:1}
+.cal-card-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.cal-tag{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:4px 6px;border-radius:8px;font-size:13px;font-weight:500;
+  background:rgba(0,0,0,.07);color:#000;white-space:nowrap;
+}
+.cal-tag svg{width:18px;height:18px;flex-shrink:0}
 
 /* ══ SEARCH SCREEN ══ */
 #searchScreen{
@@ -353,8 +377,25 @@ input:checked+.toggle-track::after{transform:translateX(20px)}
   <!-- Calendar view -->
   <div id="calendarView">
     <div class="cal-header">
-      <div class="cal-title">Kalender</div>
-      <div class="cal-sub">Alla händelser i Huddinge</div>
+      <div class="cal-header-top">
+        <button class="filter-pill" onclick="toggleFilter()">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 5h14M6 10h8M9 15h2"/></svg>
+          Filter
+        </button>
+        <button class="filter-pill" id="calDatumBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><circle cx="12" cy="16" r="1" fill="currentColor" stroke="none"/><path d="M12 13v2"/></svg>
+          Datum
+        </button>
+      </div>
+      <div class="cal-header-main">
+        <div class="cal-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><rect x="8" y="14" width="2" height="2" rx=".5" fill="#000" stroke="none"/><rect x="11" y="14" width="2" height="2" rx=".5" fill="#000" stroke="none"/><rect x="14" y="14" width="2" height="2" rx=".5" fill="#000" stroke="none"/></svg>
+        </div>
+        <div>
+          <div class="cal-title">Kalender</div>
+          <div class="cal-sub">Se alla händelser som händer denna vecka</div>
+        </div>
+      </div>
     </div>
     <div class="cal-chips" id="calChips"></div>
     <div id="calContent"></div>
@@ -730,33 +771,37 @@ function renderChips(){
 }
 
 // ── CALENDAR VIEW ──────────────────────────────────────────────────────
+function calCardHtml(item){
+  return `<div class="cal-card" onclick="calCardClick(${item.id})">
+    <img class="cal-card-img" src="${item.img}" alt="${item.name}" loading="lazy">
+    <div class="cal-card-body">
+      <div class="cal-card-name">${item.name}</div>
+      <div class="cal-card-desc">${item.desc}</div>
+      <div class="cal-card-tags">
+        <span class="cal-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          ${item.date}
+        </span>
+        <span class="cal-tag" style="background:${CAT_BG[item.cat]};color:${CAT_COLOR[item.cat]}">${CAT_LABEL[item.cat]}</span>
+        ${item.free?'<span class="cal-tag" style="background:rgba(52,199,89,.12);color:#1a7a38">Gratis</span>':''}
+      </div>
+    </div>
+  </div>`;
+}
+
 function renderCalendar(){
   const vis=getVisible();
   const groups={
-    'Maj'    : vis.filter(i=>i.date.toLowerCase().includes('maj')),
-    'Juni'   : vis.filter(i=>i.date.toLowerCase().includes('jun')),
-    'Juli'   : vis.filter(i=>i.date.toLowerCase().includes('jul')),
-    'Höst'   : vis.filter(i=>!['maj','jun','jul'].some(m=>i.date.toLowerCase().includes(m)))
+    'Maj'  : vis.filter(i=>i.date.toLowerCase().includes('maj')),
+    'Juni' : vis.filter(i=>i.date.toLowerCase().includes('jun')),
+    'Juli' : vis.filter(i=>i.date.toLowerCase().includes('jul')),
+    'Höst' : vis.filter(i=>!['maj','jun','jul'].some(m=>i.date.toLowerCase().includes(m)))
   };
   const el=document.getElementById('calContent');
   el.innerHTML=Object.entries(groups).filter(([,items])=>items.length).map(([title,items])=>`
     <div class="cal-section">
       <div class="cal-section-title">${title}</div>
-      <div class="cal-grid">
-        ${items.map(item=>`
-          <div class="cal-card" onclick="calCardClick(${item.id})">
-            <img class="cal-card-img" src="${item.img}" alt="${item.name}" loading="lazy">
-            <div class="cal-card-body">
-              <div class="cal-card-name">${item.name}</div>
-              <div class="cal-card-desc">${item.desc}</div>
-              <div class="cal-card-tags">
-                <span class="cal-tag">${item.date}</span>
-                <span class="cal-tag" style="background:${CAT_BG[item.cat]};color:${CAT_COLOR[item.cat]}">${CAT_LABEL[item.cat]}</span>
-                ${item.free?'<span class="cal-tag" style="background:rgba(52,199,89,.12);color:#1a7a38">Gratis</span>':''}
-              </div>
-            </div>
-          </div>`).join('')}
-      </div>
+      <div class="cal-h-scroll">${items.map(calCardHtml).join('')}</div>
     </div>`).join('');
 }
 
