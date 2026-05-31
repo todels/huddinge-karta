@@ -13,154 +13,68 @@
 html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;font-family:'Inter',sans-serif}
 
 /* ══ SHELL ══ */
-/* Mobile default: full-screen fixed, no flex */
-#app{
-  position:fixed;top:0;left:0;right:0;bottom:0;
-  background:#f6f6f6;
-}
-#sidePanel{display:none}
-#mapWrap{position:absolute;top:0;left:0;right:0;bottom:0}
-
-/* Desktop ≥768px: switch to flex row */
-@media(min-width:768px){
-  #app{display:flex;flex-direction:row}
-  #sidePanel{
-    display:flex;flex-direction:column;
-    width:400px;flex-shrink:0;
-    background:#f8f8f8;
-    border-right:.5px solid rgba(0,0,0,.08);
-    position:relative;z-index:50;
-    overflow:hidden;
-  }
-  #mapWrap{position:relative;flex:1;min-width:0;overflow:hidden}
-}
-
-.sp-head{
-  padding:calc(env(safe-area-inset-top,0px) + 16px) 16px 14px;
-  background:#f8f8f8;
-  flex-shrink:0;
-}
-.sp-search-row{display:flex;gap:8px;margin-bottom:12px}
-.sp-search{
-  flex:1;height:48px;display:flex;align-items:center;gap:8px;
-  padding:0 14px;border-radius:40px;border:.5px solid rgba(0,0,0,.12);
-  background:#fff;cursor:pointer;
-  font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:rgba(0,0,0,.4);
-}
-.sp-search svg{opacity:.3;flex-shrink:0}
-.sp-search span{flex:1;text-align:left;white-space:nowrap;overflow:hidden}
-.sp-filter-btn{
-  width:48px;height:48px;flex-shrink:0;
-  background:#fff;border-radius:40px;border:.5px solid rgba(0,0,0,.12);
-  display:flex;align-items:center;justify-content:center;cursor:pointer;
-  transition:background .15s;
-}
-.sp-filter-btn:hover{background:#f0f0f0}
-.sp-filter-btn.active{background:#000}
-.sp-filter-btn.active svg{stroke:#fff}
-.sp-chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0 4px}
-.sp-chips::-webkit-scrollbar{display:none}
-
-.sp-body{flex:1;overflow-y:auto;padding:16px 16px 24px}
-.sp-body::-webkit-scrollbar{display:none}
-.sp-section{margin-bottom:20px}
-.sp-section-title{font-size:16px;font-weight:600;color:#000;margin-bottom:10px}
-.sp-card{
-  display:flex;gap:12px;background:#fff;border-radius:14px;
-  overflow:hidden;cursor:pointer;margin-bottom:10px;
-  box-shadow:0 1px 8px rgba(0,0,0,.07);transition:transform .12s;
-}
-.sp-card:active,.sp-card:hover{transform:scale(.99)}
-.sp-card-img{width:88px;height:88px;object-fit:cover;flex-shrink:0;background:#e8e8e8}
-.sp-card-body{padding:10px 12px 10px 0;flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between}
-.sp-card-title{font-size:15px;font-weight:600;color:#000;line-height:1.2}
-.sp-card-desc{font-size:13px;color:rgba(0,0,0,.55);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sp-card-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.meta-tag{display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,.07);border-radius:8px;padding:3px 7px;font-size:12px;font-weight:500;color:#000;white-space:nowrap}
-.meta-tag svg{width:12px;height:12px;opacity:.55;flex-shrink:0}
-.free-badge{display:inline-flex;align-items:center;padding:3px 7px;border-radius:8px;font-size:12px;font-weight:600;background:rgba(52,199,89,.15);color:#1a7a38}
-
-/* active card in side panel (desktop) */
-#spActiveCard{
-  display:none;
-  flex-direction:column;
-  flex:1;overflow:hidden;
-}
-.sac-img{width:100%;height:200px;object-fit:cover;cursor:pointer;background:#ddd;flex-shrink:0}
-.sac-body{padding:16px;flex:1;overflow-y:auto}
-.sac-title{font-size:20px;font-weight:700;color:#000;line-height:1.2;margin-bottom:4px;cursor:pointer}
-.sac-desc{font-size:14px;color:rgba(0,0,0,.6);margin-bottom:14px}
-.sac-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-.sac-btns{display:flex;gap:8px;padding:0 16px 24px;flex-shrink:0}
-
-/* ══ MAP AREA ══ */
-#map{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0}
+#app{position:fixed;inset:0;background:#f6f6f6}
+#mapWrap{position:absolute;inset:0}
+#map{position:absolute;inset:0;z-index:0}
 .leaflet-control-zoom,.leaflet-control-attribution{display:none!important}
 
-/* ══ MOBILE TOP BAR ══ */
+/* ══ TOP BAR ══ */
 #topBar{
   position:absolute;top:0;left:0;right:0;z-index:100;
   padding:calc(env(safe-area-inset-top,44px) + 12px) 16px 20px;
-  background:linear-gradient(to bottom,rgba(0,0,0,.22) 0%,rgba(0,0,0,.06) 65%,transparent 100%);
+  background:linear-gradient(to bottom,rgba(0,0,0,.12) 0%,rgba(0,0,0,0) 100%);
   pointer-events:none;
+  display:flex;align-items:center;gap:8px;
 }
 #topBar>*{pointer-events:auto}
-@media(min-width:768px){#topBar{display:none}}
+#topChips{
+  display:flex;gap:8px;overflow-x:auto;flex:1;min-width:0;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  -webkit-mask-image:linear-gradient(to right,black calc(100% - 32px),transparent 100%);
+  mask-image:linear-gradient(to right,black calc(100% - 32px),transparent 100%);
+}
+#topChips::-webkit-scrollbar{display:none}
 
-.search-row{display:flex;gap:8px;margin-bottom:12px}
-.search-pill{
-  flex:1;min-width:0;height:56px;
-  display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 16px;
-  background:rgba(255,255,255,.4);backdrop-filter:blur(11px);-webkit-backdrop-filter:blur(11px);
-  border-radius:40px;border:none;
-  box-shadow:0 8px 25px rgba(0,0,0,.10);
-  cursor:pointer;font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:rgba(0,0,0,.4);
-}
-.search-pill svg{flex-shrink:0;opacity:.32}
-.search-pill span{flex:1;text-align:left;white-space:nowrap;overflow:hidden}
-.filter-btn{
-  width:56px;height:56px;flex-shrink:0;
-  background:rgba(255,255,255,.4);backdrop-filter:blur(11px);-webkit-backdrop-filter:blur(11px);
-  border-radius:40px;border:none;
-  box-shadow:0 8px 25px rgba(0,0,0,.10);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;transition:background .15s;
-}
-.filter-btn.active{background:rgba(0,0,0,.8)}
-.filter-btn.active svg{stroke:#fff}
-
-/* ══ CHIPS (shared) ══ */
-.chips{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:2px 0 6px;
-  -webkit-mask-image:linear-gradient(to right,black calc(100% - 44px),transparent 100%);
-  mask-image:linear-gradient(to right,black calc(100% - 44px),transparent 100%);
-}
-.chips::-webkit-scrollbar,.sp-chips::-webkit-scrollbar{display:none}
 .chip{
-  display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 9px;
-  border-radius:40px;border:none;
-  font-family:'Inter',sans-serif;font-size:15px;font-weight:500;white-space:nowrap;flex-shrink:0;
-  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  transition:opacity .18s,background .18s;cursor:pointer;
+  display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 10px 0 8px;
+  border-radius:40px;border:none;flex-shrink:0;
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:500;white-space:nowrap;
+  backdrop-filter:blur(11px);-webkit-backdrop-filter:blur(11px);
+  box-shadow:0 8px 25px rgba(0,0,0,.10);cursor:pointer;transition:background .15s,opacity .15s;
 }
-.chip svg{width:18px;height:18px;flex-shrink:0}
-.chip-event{background:rgba(209,96,23,.22);color:#bf5917}
-.chip-konst{background:rgba(71,193,206,.22);color:#068a99}
-.chip-motes{background:rgba(209,66,142,.22);color:#c0136f}
-.chip-musik{background:rgba(248,216,75,.28);color:#c3a523}
-.chip-event.chip-on{background:rgba(209,96,23,.88);color:#fff}
-.chip-konst.chip-on{background:rgba(6,138,153,.88);color:#fff}
-.chip-motes.chip-on{background:rgba(192,19,111,.88);color:#fff}
-.chip-musik.chip-on{background:rgba(185,155,25,.92);color:#fff}
-.chip-on svg{stroke:#fff!important}
+.chip svg{width:16px;height:16px;flex-shrink:0}
+.chip-event{background:rgba(201,64,145,.2);color:#c94091}
+.chip-konst{background:rgba(0,130,150,.2);color:#008296}
+.chip-motes{background:rgba(190,90,0,.2);color:#be5a00}
+.chip-musik{background:rgba(61,135,0,.2);color:#3d8700}
+.chip.chip-on.chip-event{background:rgba(201,64,145,.88);color:#fff}
+.chip.chip-on.chip-konst{background:rgba(0,130,150,.88);color:#fff}
+.chip.chip-on.chip-motes{background:rgba(190,90,0,.88);color:#fff}
+.chip.chip-on.chip-musik{background:rgba(61,135,0,.88);color:#fff}
+.chip.chip-on svg{stroke:#fff!important}
 .chip.chip-dim{opacity:.38}
-.chip-x{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-left:2px;background:rgba(255,255,255,.28);border-radius:50%;font-size:14px;line-height:1;flex-shrink:0}
-/* Desktop chips use different base style */
-@media(min-width:768px){
-  .chip{height:32px;font-size:14px;backdrop-filter:none;-webkit-backdrop-filter:none}
-  .chip-event{background:rgba(209,96,23,.18)}
-  .chip-konst{background:rgba(71,193,206,.18)}
-  .chip-motes{background:rgba(209,66,142,.18)}
-  .chip-musik{background:rgba(248,216,75,.22)}
+
+.filter-pill{
+  display:flex;align-items:center;gap:6px;height:40px;padding:4px 12px 4px 10px;
+  border-radius:40px;border:none;flex-shrink:0;
+  background:rgba(255,255,255,.9);backdrop-filter:blur(11px);-webkit-backdrop-filter:blur(11px);
+  box-shadow:0 8px 25px rgba(0,0,0,.10);cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:#000;
 }
+.filter-pill.active{background:#000;color:#fff}
+.filter-pill svg{width:18px;height:18px}
+
+/* ══ BACK BUTTON (when card panel visible) ══ */
+#backBtn{
+  position:absolute;top:calc(env(safe-area-inset-top,44px) + 12px);left:16px;z-index:201;
+  display:none;align-items:center;gap:6px;padding:6px 12px 6px 8px;
+  background:rgba(255,255,255,.9);backdrop-filter:blur(11px);-webkit-backdrop-filter:blur(11px);
+  border-radius:40px;border:none;cursor:pointer;
+  box-shadow:0 8px 25px rgba(0,0,0,.10);
+  font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:#000;
+}
+#backBtn svg{width:18px;height:18px}
+#backBtn.visible{display:flex}
 
 /* ══ MARKERS ══ */
 .mpin{position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s}
@@ -169,69 +83,138 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
 .mpin-circle{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;border-radius:50%}
 .mpin-circle svg{width:24px;height:24px}
 .mpin-sm .mpin-tail{width:44.3px;height:44.3px}
-.mpin-sm .mpin-circle{width:40px;height:40px}
+.mpin-sm .mpin-circle{width:40px;height:40px;padding:8px}
 .mpin-lg .mpin-tail{width:61.9px;height:61.9px}
-.mpin-lg .mpin-circle{width:56px;height:56px}
+.mpin-lg .mpin-circle{width:56px;height:56px;padding:12px}
 .user-dot{width:26px;height:26px;border-radius:50%;background:white;box-shadow:0 4px 8px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center}
 .user-dot-inner{width:18px;height:18px;border-radius:50%;background:#357af6}
 
-/* ══ MOBILE BOTTOM SHEET ══ */
-#sheet{position:absolute;left:0;right:0;bottom:0;z-index:200;transition:transform .38s cubic-bezier(.32,.94,.6,1)}
-@media(min-width:768px){#sheet{display:none}}
-#sheetCard{background:rgba(255,255,255,.93);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:32px 32px 40px 40px;box-shadow:0 -2px 40px rgba(0,0,0,.08)}
-.sheet-handle-wrap{padding:12px 0 4px;display:flex;justify-content:center;user-select:none;touch-action:none;-webkit-user-select:none}
-.sheet-handle{width:88px;height:5px;background:rgba(0,0,0,.18);border-radius:10px}
-.sheet-body{padding:0 16px calc(env(safe-area-inset-bottom,0px) + 36px);overflow-y:auto;max-height:72vh;overflow-x:hidden;padding-top:4px}
-.sheet-body::-webkit-scrollbar{display:none}
-.sheet-hdr{display:flex;align-items:center;gap:10px;padding:8px 0 16px}
-.sheet-hdr-icon{width:40px;height:40px;flex-shrink:0;border-radius:50%;background:rgba(0,132,154,.18);display:flex;align-items:center;justify-content:center}
-.sheet-hdr-icon svg{width:24px;height:24px}
-.sheet-hdr-title{font-size:18px;font-weight:600;color:#000}
-.sheet-hdr-sub{font-size:14px;font-weight:500;color:rgba(0,0,0,.45);margin-top:1px}
-.section{margin-bottom:24px}
-.section-title{font-size:18px;font-weight:600;color:#000;margin-bottom:10px}
-.h-scroll-wrap{margin-left:-16px;margin-right:-16px}
-.h-scroll{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 16px 16px}
-.h-scroll::-webkit-scrollbar{display:none}
-.ecard{width:200px;flex-shrink:0;background:#fff;border-radius:16px;overflow:hidden;transition:transform .15s;box-shadow:0 2px 14px rgba(0,0,0,.10)}
-.ecard:active{transform:scale(.97)}
-.ecard-img{width:100%;height:116px;object-fit:cover;display:block;background:#e8e8e8}
-.ecard-body{padding:10px 10px 12px}
-.ecard-title{font-size:15px;font-weight:600;color:#000;line-height:1.2;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ecard-desc{font-size:13px;color:rgba(0,0,0,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:8px}
-.ecard-meta{display:flex;gap:5px;flex-direction:column}
-
-/* ══ MOBILE ACTIVE CARD ══ */
-#activeCard{
-  position:absolute;left:16px;right:16px;
-  bottom:calc(env(safe-area-inset-bottom,0px) + 16px);
-  z-index:250;
-  background:rgba(255,255,255,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-radius:32px 32px 40px 40px;
-  box-shadow:0 8px 16px rgba(0,0,0,.07),0 4px 8px rgba(0,0,0,.07);
-  padding:8px;
-  transform:translateY(calc(100% + 40px));
+/* ══ CARD PANEL ══ */
+#cardPanel{
+  position:absolute;left:0;right:0;bottom:0;z-index:200;
+  background:linear-gradient(to top,rgba(0,0,0,.5) 0%,rgba(0,0,0,0) 100%);
+  padding-top:64px;
+  transform:translateY(100%);
   transition:transform .38s cubic-bezier(.32,.94,.6,1);
-  touch-action:none;user-select:none;-webkit-user-select:none;
 }
-#activeCard.visible{transform:translateY(0)}
-@media(min-width:768px){#activeCard{display:none}}
-.ac-img{width:100%;height:128px;object-fit:cover;border-radius:24px;display:block;background:#ddd;transition:opacity .15s}
-.ac-img:active{opacity:.85}
-.ac-body{padding:12px 8px 8px}
-.ac-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
-.ac-title{font-size:15px;font-weight:600;color:#000;line-height:1.2}
-.ac-title:active{opacity:.7}
-.ac-desc{font-size:13px;color:rgba(0,0,0,.7);margin-top:2px}
-.ac-logo{width:24px;height:24px;border-radius:50%;background:#e00;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:white;flex-shrink:0;margin-left:8px}
-.ac-meta{display:flex;gap:8px;margin-bottom:14px;flex-direction:column}
-.ac-btns{display:flex;gap:6px}
-.btn-ghost{flex:1;padding:16px 8px;border-radius:56px;background:rgba(70,70,70,.1);border:none;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:#000;cursor:pointer}
-.btn-dark{flex:1;padding:16px 8px;border-radius:56px;background:#000;border:none;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:#fff;cursor:pointer}
+#cardPanel.visible{transform:translateY(0)}
+
+#closeCardBtn{
+  position:absolute;top:16px;right:16px;
+  display:flex;align-items:center;gap:6px;padding:6px 12px 6px 8px;
+  background:rgba(255,255,255,.9);backdrop-filter:blur(11px);-webkit-backdrop-filter:blur(11px);
+  border-radius:40px;border:none;cursor:pointer;
+  box-shadow:0 8px 25px rgba(0,0,0,.10);
+  font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:#000;
+}
+#closeCardBtn svg{width:18px;height:18px}
+
+#cardScroll{
+  display:flex;gap:12px;overflow-x:auto;padding:0 16px calc(env(safe-area-inset-bottom,0px) + 88px) 16px;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+}
+#cardScroll::-webkit-scrollbar{display:none}
+
+/* ══ EVENT CARD ══ */
+.ev-card{
+  flex-shrink:0;width:min(320px,calc(100vw - 48px));
+  background:#fff;
+  border-radius:32px 32px 40px 40px;
+  box-shadow:0 8px 8px rgba(0,0,0,.07),0 4px 4px rgba(0,0,0,.07);
+  padding:8px;
+  scroll-snap-align:start;cursor:pointer;
+}
+.ev-card-img{width:100%;height:128px;border-radius:24px;object-fit:cover;display:block;background:#e0e0e0}
+.ev-card-body{padding:12px 8px 8px}
+.ev-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:14px}
+.ev-card-name{font-size:15px;font-weight:600;color:#000;line-height:1.2}
+.ev-card-desc{font-size:13px;color:rgba(0,0,0,.7);margin-top:2px}
+.ev-card-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.ev-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:8px;font-size:13px;font-weight:500;background:rgba(0,0,0,.07);color:#000;white-space:nowrap}
+.ev-tag svg{width:14px;height:14px;opacity:.55;flex-shrink:0}
+.ev-card-btns{display:flex;gap:6px}
+.btn-ghost{flex:1;padding:16px 8px;border-radius:56px;background:rgba(70,70,70,.1);border:none;font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:#000;cursor:pointer;white-space:nowrap}
+.btn-dark{flex:1;padding:16px 8px;border-radius:56px;background:#000;border:none;font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:#fff;cursor:pointer;white-space:nowrap}
+.free-badge{display:inline-flex;align-items:center;padding:4px 8px;border-radius:8px;font-size:13px;font-weight:600;background:rgba(52,199,89,.15);color:#1a7a38}
+
+/* ══ FLOATING TAB BAR ══ */
+#tabBar{
+  position:absolute;
+  bottom:calc(env(safe-area-inset-bottom,0px) + 20px);
+  left:50%;transform:translateX(-50%);
+  z-index:150;
+  display:flex;gap:8px;align-items:center;
+  transition:transform .35s cubic-bezier(.32,.94,.6,1),opacity .35s;
+}
+#tabBar.hidden{
+  transform:translateX(-50%) translateY(calc(100% + 40px));
+  opacity:0;pointer-events:none;
+}
+#tabPill{
+  display:flex;gap:4px;padding:4px;
+  background:#fff;border-radius:96px;
+  box-shadow:0 6px 6px rgba(0,0,0,.07),0 22px 18px rgba(0,0,0,.07);
+}
+.tab-btn{
+  display:flex;align-items:center;gap:8px;
+  height:48px;padding:8px 16px;border-radius:120px;border:none;
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;transition:background .18s,color .18s;white-space:nowrap;
+}
+.tab-btn svg{width:24px;height:24px;flex-shrink:0;display:none}
+.tab-btn.active svg{display:block}
+.tab-btn.active{background:rgba(6,138,153,.16);color:#068a99}
+.tab-btn:not(.active){background:#fff;color:#000}
+#searchTabBtn{
+  display:flex;align-items:center;justify-content:center;
+  width:56px;height:56px;border-radius:72px;border:none;
+  background:#fff;cursor:pointer;
+  box-shadow:0 6px 6px rgba(0,0,0,.07),0 22px 18px rgba(0,0,0,.07);
+}
+#searchTabBtn svg{width:28px;height:28px}
+
+/* ══ CALENDAR VIEW ══ */
+#calendarView{
+  position:absolute;inset:0;z-index:300;background:#f6f6f6;
+  transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.94,.6,1);
+  overflow-y:auto;
+  padding-bottom:calc(env(safe-area-inset-bottom,0px) + 100px);
+}
+#calendarView::-webkit-scrollbar{display:none}
+#calendarView.visible{transform:translateY(0)}
+.cal-header{
+  padding:calc(env(safe-area-inset-top,44px) + 16px) 16px 8px;
+  background:#f6f6f6;
+}
+.cal-title{font-size:24px;font-weight:700;color:#000;margin-bottom:2px}
+.cal-sub{font-size:14px;color:rgba(0,0,0,.45)}
+.cal-chips{
+  display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:12px 16px 4px;
+}
+.cal-chips::-webkit-scrollbar{display:none}
+.cal-section{padding:16px 0 0}
+.cal-section-title{font-size:18px;font-weight:600;color:#000;margin-bottom:10px;padding:0 16px}
+.cal-h-wrap{margin-left:0;margin-right:0}
+.cal-h-scroll{
+  display:flex;gap:8px;overflow-x:auto;padding:4px 16px 16px;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+}
+.cal-h-scroll::-webkit-scrollbar{display:none}
+.cal-card{
+  flex-shrink:0;width:220px;background:#fff;border-radius:16px;overflow:hidden;
+  box-shadow:0 2px 14px rgba(0,0,0,.10);cursor:pointer;transition:transform .15s;
+}
+.cal-card:active{transform:scale(.97)}
+.cal-card-img{width:100%;height:112px;object-fit:cover;display:block;background:#e8e8e8}
+.cal-card-body{padding:10px 12px 12px}
+.cal-card-name{font-size:14px;font-weight:600;color:#000;line-height:1.2;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-card-desc{font-size:12px;color:rgba(0,0,0,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px}
+.cal-card-tags{display:flex;gap:5px;flex-wrap:wrap}
+.cal-tag{display:inline-flex;align-items:center;padding:3px 7px;border-radius:8px;font-size:12px;font-weight:500;background:rgba(0,0,0,.07);color:#000;white-space:nowrap}
 
 /* ══ SEARCH SCREEN ══ */
 #searchScreen{
-  position:absolute;top:0;left:0;right:0;bottom:0;z-index:400;background:#fff;
+  position:absolute;inset:0;z-index:400;background:#fff;
   transform:translateY(100%);transition:transform .32s cubic-bezier(.32,.94,.6,1);
 }
 #searchScreen.visible{transform:translateY(0)}
@@ -242,27 +225,26 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
 .srch-input-pill input::placeholder{color:rgba(0,0,0,.4)}
 .srch-input-pill svg{opacity:.3;flex-shrink:0}
 .srch-cancel{background:none;border:none;font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:#000;cursor:pointer;white-space:nowrap;padding:0 4px;opacity:.7}
-.srch-results{padding:16px;overflow-y:auto;height:calc(100% - 100px);scrollbar-width:none}
+.srch-results{padding:16px;overflow-y:auto;height:calc(100% - 110px);scrollbar-width:none}
 .srch-results::-webkit-scrollbar{display:none}
-.srch-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.09);margin-bottom:10px;display:flex;transition:transform .12s}
+.srch-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.09);margin-bottom:10px;display:flex;transition:transform .12s;cursor:pointer}
 .srch-card:active{transform:scale(.98)}
-.srch-card-img{width:96px;height:96px;object-fit:cover;flex-shrink:0;background:#e8e8e8}
-.srch-card-body{padding:12px;flex:1;min-width:0}
+.srch-card-img{width:80px;height:80px;object-fit:cover;flex-shrink:0;background:#e8e8e8}
+.srch-card-body{padding:10px 12px;flex:1;min-width:0}
 .srch-card-title{font-size:15px;font-weight:600;color:#000;margin-bottom:2px}
-.srch-card-desc{font-size:13px;color:rgba(0,0,0,.6);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.srch-card-cat{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:12px;font-weight:600}
+.srch-card-desc{font-size:13px;color:rgba(0,0,0,.6);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.srch-card-cat{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:12px;font-weight:600}
 .srch-empty{padding:60px 16px;text-align:center;color:rgba(0,0,0,.4);font-size:15px}
 
 /* ══ DETAIL SCREEN ══ */
 #detailScreen{
-  position:absolute;top:0;left:0;right:0;bottom:0;z-index:500;background:#f6f6f6;
+  position:absolute;inset:0;z-index:500;background:#f6f6f6;
   transform:translateX(100%);transition:transform .35s cubic-bezier(.32,.94,.6,1);
   overflow-y:auto;
 }
 #detailScreen::-webkit-scrollbar{display:none}
 #detailScreen.visible{transform:translateX(0)}
 .det-hero{width:100%;height:300px;object-fit:cover;display:block;background:#ddd}
-@media(min-width:768px){.det-hero{height:240px}}
 .det-back{
   position:fixed;top:calc(env(safe-area-inset-top,44px) + 12px);left:16px;z-index:10;
   display:flex;align-items:center;gap:6px;padding:6px 12px 6px 8px;
@@ -273,7 +255,7 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
 }
 .det-back svg{width:18px;height:18px}
 .det-card{background:#f6f6f6;border-radius:32px 32px 0 0;margin-top:-40px;position:relative;z-index:1;padding:24px 16px 140px}
-.det-org-logo{width:32px;height:32px;border-radius:50%;margin:0 auto 12px;display:block;background:#e00}
+.det-cat-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:40px;font-size:13px;font-weight:600;margin:0 auto 10px;display:flex;width:fit-content}
 .det-title{font-size:24px;font-weight:600;color:#000;text-align:center;line-height:1.2;margin-bottom:8px}
 .det-subtitle{font-size:13px;color:rgba(0,0,0,.7);text-align:center;margin-bottom:20px}
 .det-stats{display:flex;border:.5px solid rgba(0,0,0,.1);border-radius:12px;overflow:hidden;margin-bottom:20px}
@@ -286,11 +268,11 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
 .det-map-label{font-size:13px;color:rgba(0,0,0,.7);font-weight:500;margin-bottom:8px}
 .det-map{width:100%;height:180px;border-radius:16px;overflow:hidden;margin-bottom:12px;background:#e8e8e8}
 .det-addr-name{font-size:20px;font-weight:600;color:#000;margin-bottom:4px}
-.det-addr-street{font-size:13px;color:rgba(0,0,0,.7);display:flex;align-items:center;gap:4px;margin-bottom:24px}
+.det-addr-street{font-size:13px;color:rgba(0,0,0,.7);margin-bottom:24px}
 .det-divider{height:.5px;background:rgba(0,0,0,.1);margin-bottom:16px}
 .det-host{display:flex;align-items:center;gap:16px;margin-bottom:8px}
-.det-host-logo{width:56px;height:56px;border-radius:50%;background:#e00;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
-.det-host-name{font-size:20px;font-weight:600;color:#000}
+.det-host-logo{width:56px;height:56px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;text-align:center;padding:6px;line-height:1.2}
+.det-host-name{font-size:18px;font-weight:600;color:#000}
 .det-host-since{font-size:13px;color:rgba(0,0,0,.7);margin-top:4px}
 .det-bottom{
   position:fixed;bottom:0;left:0;right:0;
@@ -303,62 +285,40 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
 .det-bottom-row{display:flex;gap:6px}
 
 /* ══ FILTER PANEL ══ */
-#filterBg{position:absolute;top:0;left:0;right:0;bottom:0;z-index:600;background:rgba(0,0,0,0);transition:background .25s;pointer-events:none}
+#filterBg{position:absolute;inset:0;z-index:600;background:rgba(0,0,0,0);transition:background .25s;pointer-events:none}
 #filterPanel{
   position:absolute;top:0;right:0;bottom:0;z-index:601;
-  width:min(360px,92vw);
-  background:#f8f8f8;
-  transform:translateX(100%);
-  transition:transform .32s cubic-bezier(.32,.94,.6,1);
-  display:flex;flex-direction:column;
-  box-shadow:-8px 0 40px rgba(0,0,0,.12);
+  width:min(360px,92vw);background:#f8f8f8;
+  transform:translateX(100%);transition:transform .32s cubic-bezier(.32,.94,.6,1);
+  display:flex;flex-direction:column;box-shadow:-8px 0 40px rgba(0,0,0,.12);
 }
 #filterPanel.open{transform:translateX(0)}
-.fp-head{
-  padding:calc(env(safe-area-inset-top,44px) + 12px) 20px 16px;
-  display:flex;align-items:center;justify-content:space-between;
-  border-bottom:.5px solid rgba(0,0,0,.09);flex-shrink:0;
-}
+.fp-head{padding:calc(env(safe-area-inset-top,44px) + 12px) 20px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:.5px solid rgba(0,0,0,.09);flex-shrink:0}
 .fp-title{font-size:18px;font-weight:700;color:#000}
 .fp-close{width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.08);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .fp-body{flex:1;overflow-y:auto;padding:20px;scrollbar-width:none}
 .fp-body::-webkit-scrollbar{display:none}
 .fp-section{margin-bottom:24px}
 .fp-section-title{font-size:13px;font-weight:600;color:rgba(0,0,0,.5);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
-/* Toggle */
 .fp-toggle-row{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
 .fp-toggle-label{display:flex;flex-direction:column;gap:2px}
 .fp-toggle-label span:first-child{font-size:16px;font-weight:600;color:#000}
 .fp-toggle-label span:last-child{font-size:13px;color:rgba(0,0,0,.5)}
 .toggle-sw{position:relative;width:51px;height:31px;flex-shrink:0}
 .toggle-sw input{opacity:0;width:0;height:0}
-.toggle-track{
-  position:absolute;top:0;left:0;right:0;bottom:0;border-radius:31px;
-  background:rgba(0,0,0,.15);cursor:pointer;transition:background .2s;
-}
-.toggle-track::after{
-  content:'';position:absolute;top:2px;left:2px;
-  width:27px;height:27px;border-radius:50%;background:#fff;
-  box-shadow:0 2px 4px rgba(0,0,0,.2);transition:transform .2s;
-}
+.toggle-track{position:absolute;inset:0;border-radius:31px;background:rgba(0,0,0,.15);cursor:pointer;transition:background .2s}
+.toggle-track::after{content:'';position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:transform .2s}
 input:checked+.toggle-track{background:#34c759}
 input:checked+.toggle-track::after{transform:translateX(20px)}
-/* Filter chips */
 .fp-chips{display:flex;flex-wrap:wrap;gap:8px}
-.fp-chip{
-  display:inline-flex;align-items:center;height:34px;padding:0 14px;
-  border-radius:40px;border:.5px solid rgba(0,0,0,.14);
-  background:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;
-  color:#000;cursor:pointer;transition:background .15s,border-color .15s;
-}
+.fp-chip{display:inline-flex;align-items:center;height:34px;padding:0 14px;border-radius:40px;border:.5px solid rgba(0,0,0,.14);background:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:#000;cursor:pointer;transition:background .15s,border-color .15s}
 .fp-chip.on{background:#000;color:#fff;border-color:#000}
-/* Footer */
 .fp-footer{padding:16px 20px calc(env(safe-area-inset-bottom,0px) + 16px);border-top:.5px solid rgba(0,0,0,.09);display:flex;gap:8px;flex-shrink:0;background:#f8f8f8}
 .fp-reset{flex:1;padding:14px;border-radius:56px;background:rgba(0,0,0,.08);border:none;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:#000;cursor:pointer}
 .fp-apply{flex:2;padding:14px;border-radius:56px;background:#000;border:none;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:#fff;cursor:pointer}
 
 /* ══ ACTION SHEET ══ */
-#actionSheetBg{position:absolute;top:0;left:0;right:0;bottom:0;z-index:700;background:rgba(0,0,0,0);transition:background .25s;pointer-events:none}
+#actionSheetBg{position:absolute;inset:0;z-index:700;background:rgba(0,0,0,0);transition:background .25s;pointer-events:none}
 #actionSheet{position:absolute;left:8px;right:8px;bottom:8px;z-index:701;transform:translateY(calc(100% + 12px));transition:transform .32s cubic-bezier(.32,.94,.6,1)}
 #actionSheetOptions{background:rgba(242,242,247,.92);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-radius:16px;overflow:hidden;margin-bottom:8px}
 #actionSheet .as-cancel{width:100%;padding:18px;background:rgba(242,242,247,.92);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-radius:16px;border:none;font-family:'Inter',sans-serif;font-size:17px;font-weight:600;color:#007aff;cursor:pointer}
@@ -366,255 +326,321 @@ input:checked+.toggle-track::after{transform:translateX(20px)}
 </head>
 <body>
 <div id="app">
+<div id="mapWrap">
+  <div id="map"></div>
 
-  <!-- ══ SIDE PANEL (desktop) ══ -->
-  <div id="sidePanel">
-    <div class="sp-head">
-      <div class="sp-search-row">
-        <button class="sp-search" onclick="openSearch()">
-          <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.5" stroke="#000" stroke-width="1.8"/><path d="M17 17l-3.5-3.5" stroke="#000" stroke-width="1.8" stroke-linecap="round"/></svg>
-          <span>Sök efter område eller händelse...</span>
-        </button>
-        <button class="sp-filter-btn" id="spFilterBtn" onclick="toggleFilter()">
-          <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M6 10h8M9 15h2" stroke="#000" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </button>
-      </div>
-      <div class="sp-chips chips" id="spChips"></div>
+  <!-- Top bar: chips + filter -->
+  <div id="topBar">
+    <div id="topChips"></div>
+    <button class="filter-pill" id="filterBtn" onclick="toggleFilter()">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 5h14M6 10h8M9 15h2"/></svg>
+      Filter
+    </button>
+  </div>
+
+  <!-- Back button (shown when card panel open) -->
+  <button id="backBtn" onclick="dismissCards()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    Tillbaka
+  </button>
+
+  <!-- Card panel (shown when marker clicked) -->
+  <div id="cardPanel">
+    <button id="closeCardBtn" onclick="dismissCards()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      Stäng
+    </button>
+    <div id="cardScroll"></div>
+  </div>
+
+  <!-- Calendar view -->
+  <div id="calendarView">
+    <div class="cal-header">
+      <div class="cal-title">Kalender</div>
+      <div class="cal-sub">Alla händelser i Huddinge</div>
     </div>
-    <!-- normal list view -->
-    <div class="sp-body" id="spBody"></div>
-    <!-- active card view (shown on marker click) -->
-    <div id="spActiveCard">
-      <img class="sac-img" id="sacImg" src="" alt="" onclick="openDetail(activeCardId)">
-      <div class="sac-body">
-        <div style="margin-bottom:12px">
-          <div class="sac-title" id="sacTitle" onclick="openDetail(activeCardId)"></div>
-          <div class="sac-desc" id="sacDesc"></div>
+    <div class="cal-chips" id="calChips"></div>
+    <div id="calContent"></div>
+  </div>
+
+  <!-- Search screen -->
+  <div id="searchScreen">
+    <div class="srch-top">
+      <div class="srch-row">
+        <div class="srch-input-pill">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.5" stroke="#000" stroke-width="1.8"/><path d="M17 17l-3.5-3.5" stroke="#000" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <input type="text" id="searchInput" placeholder="Sök efter händelse eller plats..." autocomplete="off" oninput="onSearch(this.value)">
         </div>
-        <div class="sac-meta" id="sacMeta"></div>
-        <div style="display:flex;gap:6px;margin-top:16px">
-          <button class="btn-ghost" id="sacFlyBtn">Hitta hit</button>
-          <button class="btn-dark" id="sacJoinBtn">Ansök att gå med</button>
-        </div>
-        <div style="margin-top:16px;padding-top:16px;border-top:.5px solid rgba(0,0,0,.08)">
-          <button onclick="dismissActiveCard()" style="width:100%;padding:12px;border-radius:12px;background:none;border:none;font-family:'Inter',sans-serif;font-size:14px;color:rgba(0,0,0,.45);cursor:pointer">← Tillbaka till listan</button>
-        </div>
+        <button class="srch-cancel" onclick="closeSearch()">Avbryt</button>
+      </div>
+    </div>
+    <div class="srch-results" id="searchResults"></div>
+  </div>
+
+  <!-- Detail screen -->
+  <div id="detailScreen">
+    <div id="detailCard" style="position:relative">
+      <button class="det-back" id="detBackBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Tillbaka
+      </button>
+      <div id="detInner"></div>
+    </div>
+    <div class="det-bottom" id="detBottom">
+      <div class="det-bottom-row">
+        <button class="btn-ghost" id="detFlyBtn">Hitta hit</button>
+        <button class="btn-dark" id="detJoinBtn">Ansök att gå med</button>
       </div>
     </div>
   </div>
 
-  <!-- ══ MAP AREA ══ -->
-  <div id="mapWrap">
-    <div id="map"></div>
-
-    <!-- Mobile top bar -->
-    <div id="topBar">
-      <div class="search-row">
-        <button class="search-pill" onclick="openSearch()">
-          <span>Sök efter område eller händelse...</span>
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.5" stroke="#000" stroke-width="1.8"/><path d="M17 17l-3.5-3.5" stroke="#000" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </button>
-        <button class="filter-btn" id="mFilterBtn" onclick="toggleFilter()">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M6 10h8M9 15h2" stroke="#000" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </button>
-      </div>
-      <div class="chips" id="chips"></div>
+  <!-- Filter panel -->
+  <div id="filterBg" onclick="closeFilter()"></div>
+  <div id="filterPanel">
+    <div class="fp-head">
+      <span class="fp-title">Filter</span>
+      <button class="fp-close" onclick="closeFilter()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"><path d="M1 1l12 12M13 1L1 13"/></svg>
+      </button>
     </div>
-
-    <!-- Mobile bottom sheet -->
-    <div id="sheet">
-      <div id="sheetCard">
-        <div class="sheet-handle-wrap" id="handleWrap"><div class="sheet-handle"></div></div>
-        <div class="sheet-body">
-          <div class="sheet-hdr">
-            <div class="sheet-hdr-icon">
-              <svg viewBox="0 0 24 24" fill="none"><path d="M16 18H19c1.105 0 2-.895 2-2V7c0-1.105-.895-2-2-2h-7M16 18l1 3M16 18H8M8 18H5c-1.105 0-2-.895-2-2V7c0-1.105.895-2 2-2h7M8 18l-1 3M12 18v2M12 5V3" stroke="#068a99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <div><div class="sheet-hdr-title">Vad händer idag?</div><div class="sheet-hdr-sub">10 nya events denna vecka!</div></div>
+    <div class="fp-body">
+      <div class="fp-section">
+        <div class="fp-section-title">Pris</div>
+        <div class="fp-toggle-row">
+          <div class="fp-toggle-label">
+            <span>Gratis</span>
+            <span>Visa endast gratis evenemang</span>
           </div>
-          <div id="sheetContent"></div>
+          <label class="toggle-sw">
+            <input type="checkbox" id="freeToggle" onchange="applyFilters()">
+            <span class="toggle-track"></span>
+          </label>
         </div>
+      </div>
+      <div class="fp-section">
+        <div class="fp-section-title">Organisatör</div>
+        <div class="fp-chips" id="fpOrgs"></div>
+      </div>
+      <div class="fp-section">
+        <div class="fp-section-title">Område</div>
+        <div class="fp-chips" id="fpAreas"></div>
       </div>
     </div>
-
-    <!-- Mobile active card -->
-    <div id="activeCard">
-      <img class="ac-img" id="acImg" src="" alt="" onclick="openDetail(activeCardId)">
-      <div class="ac-body">
-        <div class="ac-top">
-          <div><div class="ac-title" id="acTitle" onclick="openDetail(activeCardId)"></div><div class="ac-desc" id="acDesc"></div></div>
-          <div class="ac-logo">ABF</div>
-        </div>
-        <div class="ac-meta" id="acMeta"></div>
-        <div class="ac-btns">
-          <button class="btn-ghost" id="acFlyBtn">Hitta hit</button>
-          <button class="btn-dark" id="acJoinBtn">Ansök att gå med</button>
-        </div>
-      </div>
+    <div class="fp-footer">
+      <button class="fp-reset" onclick="resetFilters()">Rensa</button>
+      <button class="fp-apply" onclick="closeFilter()">Visa resultat</button>
     </div>
+  </div>
 
-    <!-- Search screen -->
-    <div id="searchScreen">
-      <div class="srch-top">
-        <div class="srch-row">
-          <div class="srch-input-pill">
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.5" stroke="#000" stroke-width="1.8"/><path d="M17 17l-3.5-3.5" stroke="#000" stroke-width="1.8" stroke-linecap="round"/></svg>
-            <input type="text" id="searchInput" placeholder="Sök efter område eller händelse..." autocomplete="off" oninput="onSearch(this.value)">
-          </div>
-          <button class="srch-cancel" onclick="closeSearch()">Avbryt</button>
-        </div>
-      </div>
-      <div class="srch-results" id="searchResults"></div>
+  <!-- Action sheet -->
+  <div id="actionSheetBg" onclick="closeActionSheet()"></div>
+  <div id="actionSheet">
+    <div id="actionSheetOptions"></div>
+    <button class="as-cancel" onclick="closeActionSheet()">Avbryt</button>
+  </div>
+
+  <!-- Floating tab bar -->
+  <div id="tabBar">
+    <div id="tabPill">
+      <button class="tab-btn active" data-tab="event" onclick="setTab('event')">
+        <!-- event icon: curtain/theater -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c3.5-.5 6.5-.5 10 0 3.5-.5 6.5-.5 10 0v13c-3.5-.5-6.5-.5-10 0C8.5 18.5 5.5 18.5 2 19V6z"/><path d="M12 6v13"/></svg>
+        Event
+      </button>
+      <button class="tab-btn" data-tab="konst" onclick="setTab('konst')">
+        <!-- konst icon: palette -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+        Konst
+      </button>
+      <button class="tab-btn" data-tab="kalender" onclick="setTab('kalender')">
+        <!-- kalender icon: calendar -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Kalender
+      </button>
     </div>
+    <button id="searchTabBtn" onclick="openSearch()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+    </button>
+  </div>
 
-    <!-- Detail screen -->
-    <div id="detailScreen">
-      <div id="detailCard" style="position:relative">
-        <button class="det-back" id="detBackBtn">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7 7M5 12l7-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Tillbaka
-        </button>
-        <div id="detInner"></div>
-      </div>
-      <div class="det-bottom" id="detBottom">
-        <div class="det-bottom-row">
-          <button class="btn-ghost" id="detFlyBtn">Hitta hit</button>
-          <button class="btn-dark" id="detJoinBtn">Ansök att gå med</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Filter panel -->
-    <div id="filterBg" onclick="closeFilter()"></div>
-    <div id="filterPanel">
-      <div class="fp-head">
-        <span class="fp-title">Filter</span>
-        <button class="fp-close" onclick="closeFilter()">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"><path d="M1 1l12 12M13 1L1 13"/></svg>
-        </button>
-      </div>
-      <div class="fp-body">
-        <!-- Gratis toggle -->
-        <div class="fp-section">
-          <div class="fp-section-title">Pris</div>
-          <div class="fp-toggle-row">
-            <div class="fp-toggle-label">
-              <span>Gratis</span>
-              <span>Visa endast gratis evenemang</span>
-            </div>
-            <label class="toggle-sw">
-              <input type="checkbox" id="freeToggle" onchange="applyFilters()">
-              <span class="toggle-track"></span>
-            </label>
-          </div>
-        </div>
-        <!-- Organisatör -->
-        <div class="fp-section">
-          <div class="fp-section-title">Organisatör</div>
-          <div class="fp-chips" id="fpOrgs"></div>
-        </div>
-        <!-- Område -->
-        <div class="fp-section">
-          <div class="fp-section-title">Område</div>
-          <div class="fp-chips" id="fpAreas"></div>
-        </div>
-      </div>
-      <div class="fp-footer">
-        <button class="fp-reset" onclick="resetFilters()">Rensa</button>
-        <button class="fp-apply" onclick="closeFilter()">Visa resultat</button>
-      </div>
-    </div>
-
-    <!-- Action sheet -->
-    <div id="actionSheetBg" onclick="closeActionSheet()"></div>
-    <div id="actionSheet">
-      <div id="actionSheetOptions"></div>
-      <button class="as-cancel" onclick="closeActionSheet()">Avbryt</button>
-    </div>
-  </div><!-- #mapWrap -->
-
+</div><!-- #mapWrap -->
 </div><!-- #app -->
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// ── SVGs ──────────────────────────────────────────────────────────
+// ── SVGs ──────────────────────────────────────────────────────────────
 const S={
-  whiteboard:`<svg viewBox="0 0 24 24" fill="none"><path d="M16 18H19c1.105 0 2-.895 2-2V7c0-1.105-.895-2-2-2h-7M16 18l1 3M16 18H8M8 18H5c-1.105 0-2-.895-2-2V7c0-1.105.895-2 2-2h7M8 18l-1 3M12 18v2M12 5V3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  mappin:`<svg viewBox="0 0 24 24" fill="none"><path d="M14.498 10c0 1.381-1.119 2.5-2.5 2.5s-2.5-1.119-2.5-2.5 1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5Z" stroke="white" stroke-width="2" stroke-linejoin="round"/><path d="M19 10c0 4.37-3.886 8.335-5.867 10.072a1.984 1.984 0 0 1-2.266 0C8.886 18.335 5 14.37 5 10a7 7 0 1 1 14 0Z" stroke="white" stroke-width="2" stroke-linejoin="round"/></svg>`,
-  audio:`<svg viewBox="0 0 24 24" fill="none"><path d="M9.998 18.5c0 1.38-1.343 2.5-3 2.5s-3-1.12-3-2.5 1.343-2.5 3-2.5 3 1.12 3 2.5Zm0 0V7.488c0-.884.579-1.663 1.425-1.916l6-1.8c1.283-.385 2.575.576 2.575 1.916V15.5m0 0c0 1.38-1.343 2.5-3 2.5s-3-1.12-3-2.5 1.343-2.5 3-2.5 3 1.12 3 2.5Z" stroke="white" stroke-width="2" stroke-linejoin="round"/></svg>`,
-  calendar:`<svg viewBox="0 0 24 24" fill="none"><path d="M2.757 10.164L3.8 16.073c.192 1.088 1.229 1.814 2.317 1.622l3.979-.701M2.757 10.164l-.347-1.97C2.218 7.106 2.944 6.069 4.032 5.877L12.896 4.314c1.088-.192 2.125.534 2.317 1.622l.173.985c.096.544-.267 1.063-.811 1.159L2.757 10.164ZM16 12v2l1.667 1.667M22 14c0 3.314-2.686 6-6 6s-6-2.686-6-6 2.686-6 6-6 6 2.686 6 6Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  clock:`<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#000" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="#000" stroke-width="1.8" stroke-linecap="round"/></svg>`,
-  pin:`<svg viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z" stroke="#000" stroke-width="1.8" stroke-linejoin="round"/></svg>`,
+  clock:`<svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`,
+  pin:`<svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>`,
+  calendar:`<svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`,
 };
+
+// Marker icons (white, for colored circle bg)
+const MSVG={
+  event:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c3.5-.5 6.5-.5 10 0 3.5-.5 6.5-.5 10 0v13c-3.5-.5-6.5-.5-10 0C8.5 18.5 5.5 18.5 2 19V6z"/><path d="M12 6v13"/></svg>`,
+  konst:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="white"/><circle cx="17.5" cy="10.5" r=".5" fill="white"/><circle cx="8.5" cy="7.5" r=".5" fill="white"/><circle cx="6.5" cy="12.5" r=".5" fill="white"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125A1.64 1.64 0 0115.314 17h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>`,
+  motes:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>`,
+  musik:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.998 18.5c0 1.38-1.343 2.5-3 2.5s-3-1.12-3-2.5 1.343-2.5 3-2.5 3 1.12 3 2.5zm0 0V7.488c0-.884.579-1.663 1.425-1.916l6-1.8c1.283-.385 2.575.576 2.575 1.916V15.5m0 0c0 1.38-1.343 2.5-3 2.5s-3-1.12-3-2.5 1.343-2.5 3-2.5 3 1.12 3 2.5z"/></svg>`,
+};
+
+// Chip SVGs (colored, for top chips)
 const CHIP_SVGS={
-  event:`<svg viewBox="0 0 24 24" fill="none"><path d="M2.757 10.164L3.8 16.073c.192 1.088 1.229 1.814 2.317 1.622l3.979-.701M2.757 10.164l-.347-1.97C2.218 7.106 2.944 6.069 4.032 5.877L12.896 4.314c1.088-.192 2.125.534 2.317 1.622l.173.985c.096.544-.267 1.063-.811 1.159L2.757 10.164ZM16 12v2l1.667 1.667M22 14c0 3.314-2.686 6-6 6s-6-2.686-6-6 2.686-6 6-6 6 2.686 6 6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  konst:`<svg viewBox="0 0 24 24" fill="none"><path d="M16 18H19c1.105 0 2-.895 2-2V7c0-1.105-.895-2-2-2h-7M16 18l1 3M16 18H8M8 18H5c-1.105 0-2-.895-2-2V7c0-1.105.895-2 2-2h7M8 18l-1 3M12 18v2M12 5V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  motes:`<svg viewBox="0 0 24 24" fill="none"><path d="M14.498 10c0 1.381-1.119 2.5-2.5 2.5s-2.5-1.119-2.5-2.5 1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M19 10c0 4.37-3.886 8.335-5.867 10.072a1.984 1.984 0 0 1-2.266 0C8.886 18.335 5 14.37 5 10a7 7 0 1 1 14 0Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>`,
-  musik:`<svg viewBox="0 0 24 24" fill="none"><path d="M9.998 18.5c0 1.38-1.343 2.5-3 2.5s-3-1.12-3-2.5 1.343-2.5 3-2.5 3 1.12 3 2.5Zm0 0V7.488c0-.884.579-1.663 1.425-1.916l6-1.8c1.283-.385 2.575.576 2.575 1.916V15.5m0 0c0 1.38-1.343 2.5-3 2.5s-3-1.12-3-2.5 1.343-2.5 3-2.5 3 1.12 3 2.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>`,
+  event:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c3.5-.5 6.5-.5 10 0 3.5-.5 6.5-.5 10 0v13c-3.5-.5-6.5-.5-10 0C8.5 18.5 5.5 18.5 2 19V6z"/><path d="M12 6v13"/></svg>`,
+  konst:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125A1.64 1.64 0 0115.314 17h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>`,
+  motes:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>`,
+  musik:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.998 18.5c0 1.38-1.343 2.5-3 2.5s-3-1.12-3-2.5 1.343-2.5 3-2.5 3 1.12 3 2.5zm0 0V7.488c0-.884.579-1.663 1.425-1.916l6-1.8c1.283-.385 2.575.576 2.575 1.916V15.5m0 0c0 1.38-1.343 2.5-3 2.5s-3-1.12-3-2.5 1.343-2.5 3-2.5 3 1.12 3 2.5z"/></svg>`,
 };
-const CAT_COLOR={event:'#bf5917',konst:'#068a99',motes:'#c0136f',musik:'#c3a523'};
-const CAT_BG={event:'rgba(209,96,23,.14)',konst:'rgba(71,193,206,.14)',motes:'rgba(209,66,142,.14)',musik:'rgba(248,216,75,.22)'};
+
+const CAT_COLOR={event:'#c94091',konst:'#008296',motes:'#be5a00',musik:'#3d8700'};
+const CAT_BG={event:'rgba(201,64,145,.14)',konst:'rgba(0,130,150,.14)',motes:'rgba(190,90,0,.14)',musik:'rgba(61,135,0,.14)'};
 const CAT_LABEL={event:'Event',konst:'Konst',motes:'Mötesplats',musik:'Musik'};
-const CAT_SVG_W={event:S.calendar,konst:S.whiteboard,motes:S.mappin,musik:S.audio};
-
-// ── DATA ──────────────────────────────────────────────────────────
-const ORGS_LIST=['ABF','Huddinge Kommun','KTH','Naturskyddsföreningen','Stadsbiblioteket','Huddinge Musikskola'];
-const AREAS_LIST=[{id:'flemingsberg',name:'Flemingsberg'},{id:'huddinge',name:'Huddinge'},{id:'skogas',name:'Skogås'},{id:'sjodalen',name:'Sjödalen'},{id:'glomsta',name:'Glömsta'},{id:'vistaberg',name:'Vistaberg'},{id:'lida',name:'Lida'}];
-
-const ITEMS=[
-  {id:1,cat:'event',name:'Flemingsberg Tour',desc:'En guideresa genom hela centrum',date:'12 Jun',time:'12:00–14:00',loc:'Flemingsbergs C',img:'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80',lat:59.2178,lng:17.9465,host:'ABF',area:'flemingsberg',free:false,addr:'Sankt Åkes väg 24',url:'https://www.abf.se',longDesc:'Upplev Flemingsberg på ett nytt sätt med denna guidade stadsrunda. Vi besöker historiska platser, modern arkitektur och gömda pärlor i ett av Huddinges mest spännande stadsdelar.'},
-  {id:2,cat:'event',name:'Kulturkvällen',desc:'Konst, mat och musik i parken',date:'14 Jun',time:'17:00–21:00',loc:'Huddinge Centrum',img:'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80',lat:59.2358,lng:17.9832,host:'Huddinge Kommun',area:'huddinge',free:true,addr:'Kommunalvägen 28',url:'https://www.huddinge.se',longDesc:'En kväll fylld av konst, lokal mat och livemusik under bar himmel. Ta med hela familjen och upplev det bästa Huddinge har att erbjuda.'},
-  {id:3,cat:'event',name:'Naturvandring',desc:'Guidad tur i Lida naturreservat',date:'15 Jun',time:'09:00–13:00',loc:'Lida',img:'https://images.unsplash.com/photo-1476820865390-c52aeebb9891?w=600&q=80',lat:59.1905,lng:17.8730,host:'Naturskyddsföreningen',area:'lida',free:true,addr:'Lida Naturreservat',url:'https://www.naturskyddsforeningen.se',longDesc:'Vandring i ett av södra Stockholms vackraste naturreservat. Guide berättar om flora och fauna längs den 8 km långa leden.'},
-  {id:4,cat:'event',name:'Familjedag',desc:'Aktiviteter för hela familjen',date:'21 Jun',time:'11:00–16:00',loc:'Sjödalen',img:'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&q=80',lat:59.2680,lng:18.0120,host:'Huddinge Kommun',area:'sjodalen',free:true,addr:'Sjödalens Gård 1',url:'https://www.huddinge.se',longDesc:'En härlig familjedag med lekar, hantverk och aktiviteter för alla åldrar. Kafé med lokalproducerade råvaror.'},
-  {id:5,cat:'konst',name:'KTH Utställning',desc:'Studentkonst och design',date:'10–30 Jun',time:'10:00–18:00',loc:'KTH Flemingsberg',img:'https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=600&q=80',lat:59.2205,lng:17.9388,host:'KTH',area:'flemingsberg',free:false,addr:'Hälsovägen 11',url:'https://www.kth.se',longDesc:'Studenternas bästa arbeten visas upp i KTHs öppna galleriyta. Allt från skulptur till digital konst och illustration.'},
-  {id:6,cat:'konst',name:'Glömsta Galleri',desc:'Lokal konst och hantverk',date:'Löpande',time:'11:00–17:00',loc:'Glömsta',img:'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=600&q=80',lat:59.2562,lng:17.9124,host:'Huddinge Kommun',area:'glomsta',free:false,addr:'Glömstavägen 5',url:'https://www.huddinge.se/kultur',longDesc:'En intim gallerupplevelse med lokala konstnärer. Utvalda verk säljs direkt från ateljeerna.'},
-  {id:7,cat:'konst',name:'Outdoor Murals',desc:'Gatukonst i Skogås',date:'Permanent',time:'Dygnet runt',loc:'Skogås',img:'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&q=80',lat:59.1998,lng:18.0352,host:'Huddinge Kommun',area:'skogas',free:true,addr:'Skogåsvägen 12',url:'https://www.huddinge.se/kultur',longDesc:'En promenadtur bland stora väggmålningar skapade av lokala konstnärer i Skogåsområdet.'},
-  {id:8,cat:'motes',name:'ABF Huddinge',desc:'Mötesplats för alla åldrar',date:'Mån–Fre',time:'09:00–17:00',loc:'Huddinge Centrum',img:'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80',lat:59.2389,lng:17.9801,host:'ABF',area:'huddinge',free:false,addr:'Kommunalvägen 32',url:'https://www.abf.se',longDesc:'ABF erbjuder kurser, föreläsningar och mötesplatser för alla åldrar. Besök oss för veckans program.'},
-  {id:9,cat:'motes',name:'Flemingsberg Bibliotek',desc:'Böcker, internet och studiero',date:'Löpande',time:'10:00–19:00',loc:'Flemingsbergs C',img:'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=600&q=80',lat:59.2192,lng:17.9450,host:'Stadsbiblioteket',area:'flemingsberg',free:true,addr:'Biblioteksvägen 1',url:'https://bibliotek.huddinge.se',longDesc:'Flemingsbergs bibliotek erbjuder böcker, tidningar, internet och en trevlig miljö för läsning och studier.'},
-  {id:10,cat:'motes',name:'Sjödalen Gård',desc:'Historisk gård och mötesplats',date:'Löpande',time:'10:00–16:00',loc:'Sjödalen',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80',lat:59.2680,lng:18.0050,host:'Huddinge Kommun',area:'sjodalen',free:true,addr:'Sjödalsvägen 3',url:'https://www.huddinge.se/kultur',longDesc:'Historisk gård från 1700-talet, nu mötesplats för hembygdsföreningen. Café öppet på helger.'},
-  {id:11,cat:'musik',name:'Jazz i parken',desc:'Sommarjazz under öppen himmel',date:'20 Jun',time:'18:00–21:00',loc:'Stortorget',img:'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=600&q=80',lat:59.2410,lng:17.9870,host:'Huddinge Kommun',area:'huddinge',free:true,addr:'Stortorget 1',url:'https://www.huddinge.se/kultur',longDesc:'Årets stora utomhuskonsert med lokala jazzmusiker. Ta med picknickkorgen och njut av en varm sommarnatt.'},
-  {id:12,cat:'musik',name:'Sommarkonsert',desc:'Klassisk musik i Vistabergs kyrka',date:'28 Jun',time:'19:00–21:30',loc:'Vistabergs Kyrka',img:'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=600&q=80',lat:59.1845,lng:17.9650,host:'Huddinge Musikskola',area:'vistaberg',free:false,addr:'Kyrkovägen 5',url:'https://www.huddinge.se/kultur',longDesc:'En klassisk konsert med stycken av Mozart, Haydn och Beethoven framförda av det lokala kammarorkestret.'},
-  {id:13,cat:'musik',name:'Trubadur på Torget',desc:'Folkmusik och visor',date:'22 Jun',time:'14:00–16:00',loc:'Huddinge Torg',img:'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&q=80',lat:59.2367,lng:17.9811,host:'Huddinge Musikskola',area:'huddinge',free:true,addr:'Huddinge Torg 2',url:'https://www.huddinge.se/kultur',longDesc:'Elever och lärare framför folkmusik och svenska visor på det öppna torget.'},
+const AREAS_LIST=[
+  {id:'flemingsberg',name:'Flemingsberg'},{id:'huddinge',name:'Huddinge'},
+  {id:'skogas',name:'Skogås'},{id:'sjodalen',name:'Sjödalen'},
+  {id:'glomsta',name:'Glömsta'},{id:'vistaberg',name:'Vistaberg'},{id:'lida',name:'Lida'}
 ];
 
-// ── STATE ─────────────────────────────────────────────────────────
-let map, leafMarkers={}, activeCardId=null, collapsed=false, detailMapInstance=null;
-let selectedCat=null;
+// ── STATE ──────────────────────────────────────────────────────────────
+let ITEMS=[], ORGS_LIST=[];
+let map, leafMarkers={}, activeIds=[], selectedCat=null, activeTab='event', detailMapInstance=null;
 const filterState={free:false,orgs:new Set(),areas:new Set()};
 
-function isDesktop(){ return window.innerWidth>=768; }
-
-// ── MAP ───────────────────────────────────────────────────────────
+// ── MAP ────────────────────────────────────────────────────────────────
 const BOUNDS=L.latLngBounds([59.08,17.73],[59.34,18.24]);
+
 function initMap(){
-  map=L.map('map',{center:[59.218,17.978],zoom:13,minZoom:11,maxZoom:16,maxBounds:BOUNDS,maxBoundsViscosity:1,zoomControl:false,attributionControl:false});
+  map=L.map('map',{
+    center:[59.218,17.978],zoom:13,minZoom:11,maxZoom:16,
+    maxBounds:BOUNDS,maxBoundsViscosity:1,
+    zoomControl:false,attributionControl:false
+  });
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
   const ui=L.divIcon({html:`<div class="user-dot"><div class="user-dot-inner"></div></div>`,className:'',iconSize:[26,26],iconAnchor:[13,13]});
   L.marker([59.2195,17.9490],{icon:ui,interactive:false}).addTo(map);
   ITEMS.forEach(addMarker);
-  map.on('click',()=>{ dismissActiveCard(); });
-  // Invalidate size when panel opens/closes
-  window.addEventListener('resize',()=>{ map.invalidateSize(); });
+  map.on('click',()=>{ if(activeIds.length) dismissCards(); });
+  window.addEventListener('resize',()=>map.invalidateSize());
 }
+
 function mHtml(cat,big){
-  const sz=big?'mpin-lg':'mpin-sm', wt=big?87.6:62.7, p=big?'16px':'8px';
-  return `<div class="mpin ${sz}" style="width:${wt}px;height:${wt}px"><div class="mpin-tail"></div><div class="mpin-circle" style="background:${CAT_COLOR[cat]};padding:${p}">${CAT_SVG_W[cat]}</div></div>`;
+  const sz=big?'mpin-lg':'mpin-sm', wt=big?87.6:62.7, p=big?'16px':'10px';
+  return `<div class="mpin ${sz}" style="width:${wt}px;height:${wt}px">
+    <div class="mpin-tail"></div>
+    <div class="mpin-circle" style="background:${CAT_COLOR[cat]};padding:${p}">${MSVG[cat]}</div>
+  </div>`;
 }
+
 function addMarker(item){
-  const big=activeCardId===item.id, sz=big?87.6:62.7;
+  const big=activeIds.includes(item.id), sz=big?87.6:62.7;
   const icon=L.divIcon({html:mHtml(item.cat,big),className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz]});
   const m=L.marker([item.lat,item.lng],{icon}).addTo(map);
-  m.on('click',e=>{ L.DomEvent.stopPropagation(e); showActiveCard(item.id); });
+  m.on('click',e=>{ L.DomEvent.stopPropagation(e); handleMarkerClick(item); });
   leafMarkers[item.id]=m;
 }
+
 function refreshMarker(id){
   const m=leafMarkers[id]; if(!m)return;
-  const item=ITEMS.find(x=>x.id===id);
-  const big=activeCardId===id, sz=big?87.6:62.7;
+  const item=ITEMS.find(x=>x.id===id); if(!item)return;
+  const big=activeIds.includes(id), sz=big?87.6:62.7;
   m.setIcon(L.divIcon({html:mHtml(item.cat,big),className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz]}));
 }
 
-// ── FILTER LOGIC ─────────────────────────────────────────────────
+// ── MARKER CLICK ───────────────────────────────────────────────────────
+function handleMarkerClick(clickedItem){
+  // Find all visible items at approximately the same location (within ~50m)
+  const vis=getVisible();
+  const nearby=vis.filter(i=>
+    Math.abs(i.lat-clickedItem.lat)<0.001 &&
+    Math.abs(i.lng-clickedItem.lng)<0.001
+  );
+  const ids=nearby.length?nearby.map(i=>i.id):[clickedItem.id];
+  showCards(ids);
+}
+
+function showCards(ids){
+  const prevIds=[...activeIds];
+  activeIds=ids;
+  prevIds.forEach(id=>{ if(!activeIds.includes(id)) refreshMarker(id); });
+  activeIds.forEach(refreshMarker);
+
+  // Render cards
+  const scroll=document.getElementById('cardScroll');
+  scroll.innerHTML=activeIds.map(id=>{
+    const item=ITEMS.find(x=>x.id===id); if(!item)return'';
+    return evCardHtml(item);
+  }).join('');
+
+  // Show panel, hide tab bar, show back btn
+  document.getElementById('cardPanel').classList.add('visible');
+  document.getElementById('tabBar').classList.add('hidden');
+  document.getElementById('backBtn').classList.add('visible');
+  document.getElementById('topBar').style.opacity='0';
+  document.getElementById('topBar').style.pointerEvents='none';
+
+  // Fly to first item
+  const first=ITEMS.find(x=>x.id===ids[0]);
+  if(first) map.flyTo([first.lat,first.lng],15,{duration:0.7,easeLinearity:0.5});
+}
+
+function dismissCards(){
+  const prevIds=[...activeIds];
+  activeIds=[];
+  prevIds.forEach(refreshMarker);
+  document.getElementById('cardPanel').classList.remove('visible');
+  document.getElementById('tabBar').classList.remove('hidden');
+  document.getElementById('backBtn').classList.remove('visible');
+  document.getElementById('topBar').style.opacity='';
+  document.getElementById('topBar').style.pointerEvents='';
+}
+
+// ── CARD HTML ──────────────────────────────────────────────────────────
+function evCardHtml(item){
+  const col=CAT_COLOR[item.cat], lbl=CAT_LABEL[item.cat];
+  return `<div class="ev-card" onclick="">
+    <img class="ev-card-img" src="${item.img}" alt="${item.name}" loading="lazy">
+    <div class="ev-card-body">
+      <div class="ev-card-top">
+        <div>
+          <div class="ev-card-name">${item.name}</div>
+          <div class="ev-card-desc">${item.desc}</div>
+        </div>
+      </div>
+      <div class="ev-card-tags">
+        <span class="ev-tag">${S.clock}${item.date} · ${item.time.split('–')[0].split('-')[0]}</span>
+        <span class="ev-tag">${S.pin}${item.loc}</span>
+        <span class="ev-tag" style="background:${CAT_BG[item.cat]};color:${col}">${lbl}</span>
+        ${item.free?'<span class="free-badge">Gratis</span>':''}
+      </div>
+      <div class="ev-card-btns">
+        <button class="btn-ghost" onclick="openDetail(${item.id})">Mer info</button>
+        <button class="btn-dark" onclick="openEventUrl(${JSON.stringify(item).replace(/"/g,'&quot;')})">Ansök</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── TAB NAVIGATION ─────────────────────────────────────────────────────
+function setTab(tab){
+  activeTab=tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    b.classList.toggle('active',b.dataset.tab===tab);
+  });
+  if(tab==='kalender'){
+    document.getElementById('calendarView').classList.add('visible');
+    renderCalendar();
+  } else {
+    document.getElementById('calendarView').classList.remove('visible');
+    if(tab==='konst'){
+      selectedCat='konst';
+    } else {
+      selectedCat=null;
+    }
+    renderChips();
+    applyFilters();
+  }
+}
+
+// ── FILTER LOGIC ───────────────────────────────────────────────────────
 function getVisible(){
   return ITEMS.filter(i=>{
     if(selectedCat && i.cat!==selectedCat) return false;
@@ -624,6 +650,7 @@ function getVisible(){
     return true;
   });
 }
+
 function applyFilters(){
   filterState.free=document.getElementById('freeToggle').checked;
   const vis=getVisible();
@@ -632,25 +659,27 @@ function applyFilters(){
     const show=vis.some(v=>v.id===item.id);
     show?(!map.hasLayer(m)&&map.addLayer(m)):(map.hasLayer(m)&&map.removeLayer(m));
   });
-  renderContent();
   updateFilterBtnState();
 }
+
 function updateFilterBtnState(){
   const active=filterState.free||filterState.orgs.size>0||filterState.areas.size>0;
-  document.getElementById('mFilterBtn')?.classList.toggle('active',active);
-  document.getElementById('spFilterBtn')?.classList.toggle('active',active);
+  document.getElementById('filterBtn')?.classList.toggle('active',active);
 }
+
 function resetFilters(){
   filterState.free=false; filterState.orgs.clear(); filterState.areas.clear();
   document.getElementById('freeToggle').checked=false;
   document.querySelectorAll('#fpOrgs .fp-chip, #fpAreas .fp-chip').forEach(c=>c.classList.remove('on'));
   applyFilters();
 }
+
 function toggleFpChip(el,set,val){
-  if(set.has(val)){ set.delete(val); el.classList.remove('on'); }
-  else{ set.add(val); el.classList.add('on'); }
+  if(set.has(val)){set.delete(val);el.classList.remove('on');}
+  else{set.add(val);el.classList.add('on');}
   applyFilters();
 }
+
 function initFilterChips(){
   const orgsEl=document.getElementById('fpOrgs');
   ORGS_LIST.forEach(o=>{
@@ -667,270 +696,102 @@ function initFilterChips(){
     areasEl.appendChild(b);
   });
 }
+
 function toggleFilter(){
   const fp=document.getElementById('filterPanel');
   fp.classList.contains('open')?closeFilter():openFilter();
 }
 function openFilter(){
-  const fp=document.getElementById('filterPanel');
+  document.getElementById('filterPanel').classList.add('open');
   const bg=document.getElementById('filterBg');
-  fp.classList.add('open');
-  bg.style.pointerEvents='auto';
-  bg.style.background='rgba(0,0,0,.15)';
+  bg.style.pointerEvents='auto'; bg.style.background='rgba(0,0,0,.15)';
 }
 function closeFilter(){
   document.getElementById('filterPanel').classList.remove('open');
   const bg=document.getElementById('filterBg');
-  bg.style.background='rgba(0,0,0,0)';
-  bg.style.pointerEvents='none';
+  bg.style.background='rgba(0,0,0,0)'; bg.style.pointerEvents='none';
 }
 
-// ── CATEGORY CHIPS ────────────────────────────────────────────────
+// ── CATEGORY CHIPS ─────────────────────────────────────────────────────
 function selectCat(cat){
+  if(activeTab==='konst'){ selectedCat=null; setTab('event'); return; }
   selectedCat=(selectedCat===cat)?null:cat;
   renderChips(); applyFilters();
 }
-function chipHtml(cat,containerId){
+
+function chipHtml(cat){
   const isOn=selectedCat===cat, isDim=selectedCat!==null&&!isOn;
   return `<button class="chip chip-${cat}${isOn?' chip-on':''}${isDim?' chip-dim':''}" onclick="selectCat('${cat}')">
     ${CHIP_SVGS[cat]}${CAT_LABEL[cat]}
-    ${isOn?`<span class="chip-x" onclick="event.stopPropagation();selectCat('${cat}')">×</span>`:''}
   </button>`;
 }
+
 function renderChips(){
   const html=['event','konst','motes','musik'].map(c=>chipHtml(c)).join('');
-  const m=document.getElementById('chips'); if(m) m.innerHTML=html;
-  const s=document.getElementById('spChips'); if(s) s.innerHTML=html.replace(/onclick="selectCat/g,"onclick=\"selectCat");
+  const tc=document.getElementById('topChips'); if(tc) tc.innerHTML=html;
+  const cc=document.getElementById('calChips'); if(cc) cc.innerHTML=html;
 }
 
-// ── CONTENT RENDERING ─────────────────────────────────────────────
-function metaHtml(item){
-  return `<div class="meta-tag">${S.clock}${item.date} · ${item.time.split('–')[0]}</div>
-          <div class="meta-tag">${S.pin}${item.loc}</div>
-          ${item.free?'<span class="free-badge">Gratis</span>':''}`;
-}
-// Mobile horizontal card
-function eCardHtml(item){
-  return `<div class="ecard" onclick="showActiveCard(${item.id})">
-    <img class="ecard-img" src="${item.img}" alt="${item.name}" loading="lazy">
-    <div class="ecard-body">
-      <div class="ecard-title">${item.name}</div>
-      <div class="ecard-desc">${item.desc}</div>
-      <div class="ecard-meta">${metaHtml(item)}</div>
-    </div>
-  </div>`;
-}
-// Desktop vertical card
-function spCardHtml(item){
-  return `<div class="sp-card" onclick="showActiveCard(${item.id})">
-    <img class="sp-card-img" src="${item.img}" alt="${item.name}" loading="lazy">
-    <div class="sp-card-body">
-      <div>
-        <div class="sp-card-title">${item.name}</div>
-        <div class="sp-card-desc">${item.desc}</div>
-      </div>
-      <div class="sp-card-meta">${metaHtml(item)}</div>
-    </div>
-  </div>`;
-}
-function renderContent(){
+// ── CALENDAR VIEW ──────────────────────────────────────────────────────
+function renderCalendar(){
   const vis=getVisible();
-  // Mobile sheet
-  const byCat=cat=>vis.filter(i=>i.cat===cat);
-  const secHtml=(title,items)=>items.length?`<div class="section"><div class="section-title">${title}</div><div class="h-scroll-wrap"><div class="h-scroll">${items.map(eCardHtml).join('')}</div></div></div>`:'';
-  const shEl=document.getElementById('sheetContent');
-  if(shEl) shEl.innerHTML=secHtml('Events',byCat('event'))+secHtml('Konst',byCat('konst'))+secHtml('Mötesplatser',byCat('motes'))+secHtml('Musik',byCat('musik'));
-  // Desktop sidebar
-  const spEl=document.getElementById('spBody');
-  if(spEl){
-    const spSecHtml=(title,items)=>items.length?`<div class="sp-section"><div class="sp-section-title">${title}</div>${items.map(spCardHtml).join('')}</div>`:'';
-    spEl.innerHTML=spSecHtml('Events',byCat('event'))+spSecHtml('Konst',byCat('konst'))+spSecHtml('Mötesplatser',byCat('motes'))+spSecHtml('Musik',byCat('musik'));
-  }
+  const groups={
+    'Maj'    : vis.filter(i=>i.date.toLowerCase().includes('maj')),
+    'Juni'   : vis.filter(i=>i.date.toLowerCase().includes('jun')),
+    'Juli'   : vis.filter(i=>i.date.toLowerCase().includes('jul')),
+    'Höst'   : vis.filter(i=>!['maj','jun','jul'].some(m=>i.date.toLowerCase().includes(m)))
+  };
+  const el=document.getElementById('calContent');
+  el.innerHTML=Object.entries(groups).filter(([,items])=>items.length).map(([title,items])=>`
+    <div class="cal-section">
+      <div class="cal-section-title">${title}</div>
+      <div class="cal-h-wrap"><div class="cal-h-scroll">
+        ${items.map(item=>`
+          <div class="cal-card" onclick="calCardClick(${item.id})">
+            <img class="cal-card-img" src="${item.img}" alt="${item.name}" loading="lazy">
+            <div class="cal-card-body">
+              <div class="cal-card-name">${item.name}</div>
+              <div class="cal-card-desc">${item.desc}</div>
+              <div class="cal-card-tags">
+                <span class="cal-tag">${item.date}</span>
+                <span class="cal-tag" style="background:${CAT_BG[item.cat]};color:${CAT_COLOR[item.cat]}">${CAT_LABEL[item.cat]}</span>
+                ${item.free?'<span class="cal-tag" style="background:rgba(52,199,89,.12);color:#1a7a38">Gratis</span>':''}
+              </div>
+            </div>
+          </div>`).join('')}
+      </div></div>
+    </div>`).join('');
 }
 
-// ── ACTIVE CARD ───────────────────────────────────────────────────
-function showActiveCard(id){
-  const prev=activeCardId; activeCardId=id;
-  if(prev&&prev!==id) refreshMarker(prev);
-  refreshMarker(id);
-  const item=ITEMS.find(x=>x.id===id);
-  const meta=`<div class="meta-tag">${S.clock}${item.date} · ${item.time.split('–')[0]}</div><div class="meta-tag">${S.pin}${item.loc}</div>${item.free?'<span class="free-badge">Gratis</span>':''}`;
-  if(isDesktop()){
-    // Show in side panel
-    document.getElementById('sacImg').src=item.img;
-    document.getElementById('sacTitle').textContent=item.name;
-    document.getElementById('sacDesc').textContent=item.desc;
-    document.getElementById('sacMeta').innerHTML=meta;
-    document.getElementById('sacFlyBtn').onclick=()=>openMapsSheet(item);
-    document.getElementById('sacJoinBtn').onclick=()=>openEventUrl(item);
-    document.getElementById('spBody').style.display='none';
-    document.getElementById('spActiveCard').style.display='flex';
-  } else {
-    // Mobile bottom card
-    document.getElementById('acImg').src=item.img;
-    document.getElementById('acTitle').textContent=item.name;
-    document.getElementById('acDesc').textContent=item.desc;
-    document.getElementById('acMeta').innerHTML=meta;
-    document.getElementById('acFlyBtn').onclick=()=>openMapsSheet(item);
-    document.getElementById('acJoinBtn').onclick=()=>openEventUrl(item);
-    document.getElementById('detailScreen').querySelector('.det-back').onclick=closeDetail;
-    hideSheet();
-    document.getElementById('activeCard').classList.add('visible');
-  }
-  flyToItem(item);
-}
-function dismissActiveCard(){
-  const prev=activeCardId; activeCardId=null;
-  if(prev) refreshMarker(prev);
-  if(isDesktop()){
-    document.getElementById('spActiveCard').style.display='none';
-    document.getElementById('spBody').style.display='';
-  } else {
-    const ac=document.getElementById('activeCard');
-    const offY=ac.offsetHeight+40;
-    ac.style.transition='transform .32s cubic-bezier(.4,0,.6,1)';
-    ac.style.transform=`translateY(${offY}px)`;
-    ac.addEventListener('transitionend',function done(){
-      ac.removeEventListener('transitionend',done);
-      ac.classList.remove('visible');
-      ac.style.transition=''; ac.style.transform='';
-      expandSheet();
-    },{once:true});
-  }
+function calCardClick(id){
+  setTab('event');
+  setTimeout(()=>{
+    const item=ITEMS.find(x=>x.id===id);
+    if(item){ showCards([id]); }
+  },400);
 }
 
-// ── FLY TO ────────────────────────────────────────────────────────
-function flyToItem(item){
-  map.flyTo([item.lat,item.lng],15,{duration:0.7,easeLinearity:0.5});
-  map.once('moveend',function(){
-    const pt=map.latLngToContainerPoint([item.lat,item.lng]);
-    const mapH=document.getElementById('mapWrap').offsetHeight;
-    let topBarH=160, bottomH=isDesktop()?40:380;
-    const targetY=topBarH+(mapH-topBarH-bottomH)/2;
-    const panY=Math.round(pt.y-targetY);
-    if(Math.abs(panY)>8) map.panBy([0,panY],{animate:true,duration:0.25});
-  });
+// ── SEARCH ─────────────────────────────────────────────────────────────
+function openSearch(){
+  document.getElementById('searchScreen').classList.add('visible');
+  setTimeout(()=>document.getElementById('searchInput').focus(),300);
+  onSearch('');
 }
-
-// ── SHEET (mobile) ────────────────────────────────────────────────
-const PEEK=230;
-function hideSheet(){ const h=document.getElementById('sheetCard').offsetHeight+40; document.getElementById('sheet').style.transform=`translateY(${h}px)`; collapsed=true; }
-function collapseSheet(){ const h=document.getElementById('sheetCard').offsetHeight; document.getElementById('sheet').style.transform=`translateY(${h-PEEK}px)`; collapsed=true; }
-function expandSheet(){ document.getElementById('sheet').style.transform='translateY(0)'; collapsed=false; }
-
-let dY0,dT0,dDrag=false;
-function setupSheetDrag(){
-  const hw  = document.getElementById('handleWrap');
-  const body= document.getElementById('sheetContent').parentElement; // .sheet-body
-  const sh  = document.getElementById('sheet');
-
-  function onStart(y){
-    if(document.getElementById('activeCard').classList.contains('visible')) return;
-    dDrag=true; dY0=y;
-    dT0=collapsed ? document.getElementById('sheetCard').offsetHeight-PEEK : 0;
-    sh.style.transition='none';
-  }
-  function onMove(y){ if(!dDrag) return; sh.style.transform=`translateY(${Math.max(0,dT0+y-dY0)}px)`; }
-  function onEnd(y){
-    if(!dDrag) return; dDrag=false; sh.style.transition='';
-    const dy=y-dY0;
-    if(dy>50) collapseSheet(); else if(dy<-50) expandSheet(); else collapsed?collapseSheet():expandSheet();
-  }
-
-  // ── Handle pip ──────────────────────────────────────────────────
-  hw.addEventListener('touchstart',e=>{ e.preventDefault(); onStart(e.touches[0].clientY); },{passive:false});
-  document.addEventListener('touchmove',e=>{ if(dDrag){ e.preventDefault(); onMove(e.touches[0].clientY); } },{passive:false});
-  document.addEventListener('touchend',e=>{ if(dDrag) onEnd(e.changedTouches[0].clientY); },{passive:true});
-  // desktop pointer
-  hw.addEventListener('pointerdown',e=>{ if(e.pointerType==='touch')return; onStart(e.clientY); hw.setPointerCapture(e.pointerId); });
-  hw.addEventListener('pointermove',e=>{ if(e.pointerType==='touch')return; onMove(e.clientY); });
-  hw.addEventListener('pointerup',  e=>{ if(e.pointerType==='touch')return; onEnd(e.clientY); });
-
-  // ── Sheet body: drag-down when already scrolled to top ──────────
-  let bodyY0=0, bodyDrag=false;
-  body.addEventListener('touchstart',e=>{
-    if(document.getElementById('activeCard').classList.contains('visible')) return;
-    bodyY0=e.touches[0].clientY; bodyDrag=false;
-  },{passive:true});
-  body.addEventListener('touchmove',e=>{
-    if(document.getElementById('activeCard').classList.contains('visible')) return;
-    const dy=e.touches[0].clientY-bodyY0;
-    // Only hijack if: not already collapsed, at scroll top, swiping DOWN
-    if(!collapsed && body.scrollTop===0 && dy>6){
-      bodyDrag=true;
-    }
-    if(bodyDrag){
-      e.preventDefault();
-      sh.style.transition='none';
-      sh.style.transform=`translateY(${Math.max(0,dy)}px)`;
-    }
-  },{passive:false});
-  body.addEventListener('touchend',e=>{
-    if(!bodyDrag) return; bodyDrag=false;
-    sh.style.transition='';
-    const dy=e.changedTouches[0].clientY-bodyY0;
-    if(dy>80) collapseSheet(); else expandSheet();
-  },{passive:true});
-
-  // ── Whole sheet card: drag up from anywhere when collapsed ───────
-  const card=document.getElementById('sheetCard');
-  let cardY0=0, cardDrag=false;
-  card.addEventListener('touchstart',e=>{
-    if(document.getElementById('activeCard').classList.contains('visible')) return;
-    cardY0=e.touches[0].clientY; cardDrag=false;
-  },{passive:true});
-  card.addEventListener('touchmove',e=>{
-    if(document.getElementById('activeCard').classList.contains('visible')) return;
-    const dy=e.touches[0].clientY-cardY0;
-    if(collapsed && dy<-6) cardDrag=true;
-    if(cardDrag){
-      e.preventDefault();
-      const base=document.getElementById('sheetCard').offsetHeight-PEEK;
-      sh.style.transition='none';
-      sh.style.transform=`translateY(${Math.max(0,base+dy)}px)`;
-    }
-  },{passive:false});
-  card.addEventListener('touchend',e=>{
-    if(!cardDrag) return; cardDrag=false;
-    sh.style.transition='';
-    const dy=e.changedTouches[0].clientY-cardY0;
-    if(dy<-60) expandSheet(); else collapseSheet();
-  },{passive:true});
+function closeSearch(){
+  document.getElementById('searchScreen').classList.remove('visible');
+  document.getElementById('searchInput').value='';
 }
-
-// ── ACTIVE CARD SWIPE DISMISS ────────────────────────────────────
-function setupActiveCardSwipe(){
-  const ac=document.getElementById('activeCard');
-  let acY0=0,acDrag=false;
-  ac.addEventListener('touchstart',e=>{ if(!ac.classList.contains('visible'))return; acDrag=true; acY0=e.touches[0].clientY; ac.style.transition='none'; },{passive:true});
-  ac.addEventListener('touchmove',e=>{ if(!acDrag)return; const dy=e.touches[0].clientY-acY0; if(dy>0){e.preventDefault();ac.style.transform=`translateY(${dy}px)`;} },{passive:false});
-  ac.addEventListener('touchend',e=>{
-    if(!acDrag)return; acDrag=false;
-    const dy=e.changedTouches[0].clientY-acY0;
-    if(dy>60){
-      const offY=ac.offsetHeight+40;
-      ac.style.transition='transform .32s cubic-bezier(.4,0,.6,1)';
-      ac.style.transform=`translateY(${offY}px)`;
-      ac.addEventListener('transitionend',function done(){
-        ac.removeEventListener('transitionend',done);
-        ac.classList.remove('visible'); ac.style.transition=''; ac.style.transform='';
-        const prev=activeCardId; activeCardId=null; if(prev) refreshMarker(prev);
-        expandSheet();
-      },{once:true});
-    } else { ac.style.transition='transform .3s cubic-bezier(.32,.94,.6,1)'; ac.style.transform='translateY(0)'; }
-  },{passive:true});
-}
-
-// ── SEARCH ────────────────────────────────────────────────────────
-function openSearch(){ document.getElementById('searchScreen').classList.add('visible'); setTimeout(()=>document.getElementById('searchInput').focus(),300); onSearch(''); }
-function closeSearch(){ document.getElementById('searchScreen').classList.remove('visible'); document.getElementById('searchInput').value=''; }
 function onSearch(q){
   const res=document.getElementById('searchResults');
   const term=q.trim().toLowerCase();
-  const hits=term?ITEMS.filter(i=>i.name.toLowerCase().includes(term)||i.loc.toLowerCase().includes(term)):ITEMS;
+  const hits=term?ITEMS.filter(i=>
+    i.name.toLowerCase().includes(term)||
+    i.loc.toLowerCase().includes(term)||
+    i.host.toLowerCase().includes(term)
+  ):ITEMS;
   if(!hits.length){res.innerHTML=`<div class="srch-empty">Inga resultat för "${q}"</div>`;return;}
   res.innerHTML=hits.map(item=>`
-    <div class="srch-card" onclick="closeSearch();showActiveCard(${item.id})">
+    <div class="srch-card" onclick="closeSearch();showCards([${item.id}])">
       <img class="srch-card-img" src="${item.img}" alt="${item.name}" loading="lazy">
       <div class="srch-card-body">
         <div class="srch-card-title">${item.name}</div>
@@ -943,23 +804,31 @@ function onSearch(q){
     </div>`).join('');
 }
 
-// ── DETAIL ────────────────────────────────────────────────────────
+// ── DETAIL SCREEN ──────────────────────────────────────────────────────
 function openDetail(id){
   const item=ITEMS.find(x=>x.id===id); if(!item)return;
   const col=CAT_COLOR[item.cat], bg=CAT_BG[item.cat], lbl=CAT_LABEL[item.cat];
-  const icoFn=(c)=>CAT_SVG_W[item.cat].replace(/stroke="white"/g,`stroke="${c}"`);
   document.getElementById('detInner').innerHTML=`
     <img class="det-hero" src="${item.img}" alt="${item.name}">
     <div class="det-card">
       <div style="text-align:center">
-        <div style="display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:40px;background:${bg};color:${col};font-size:13px;font-weight:600;margin:0 0 10px">${icoFn(col)}${lbl}</div>
+        <div class="det-cat-badge" style="background:${bg};color:${col}">${MSVG[item.cat].replace(/stroke="white"/g,`stroke="${col}"`)}${lbl}</div>
         <div class="det-title">${item.name}</div>
         <div class="det-subtitle">${item.desc}</div>
       </div>
       <div class="det-stats">
-        <div class="det-stat"><div class="det-stat-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#333" stroke-width="1.8"/><path d="M8 2v4M16 2v4M3 10h18" stroke="#333" stroke-width="1.8" stroke-linecap="round"/></svg></div><div class="det-stat-val">${item.date}</div></div>
-        <div class="det-stat"><div class="det-stat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z" stroke="#333" stroke-width="1.8" stroke-linejoin="round"/></svg></div><div class="det-stat-val">${item.loc}</div></div>
-        <div class="det-stat"><div class="det-stat-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#333" stroke-width="1.8"/><path d="M12 7v5l3 2" stroke="#333" stroke-width="1.8" stroke-linecap="round"/></svg></div><div class="det-stat-val">${item.time}</div></div>
+        <div class="det-stat">
+          <div class="det-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+          <div class="det-stat-val">${item.date}</div>
+        </div>
+        <div class="det-stat">
+          <div class="det-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg></div>
+          <div class="det-stat-val">${item.loc}</div>
+        </div>
+        <div class="det-stat">
+          <div class="det-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <div class="det-stat-val">${item.time}</div>
+        </div>
       </div>
       <p class="det-desc">${item.longDesc}</p>
       <div class="det-map-label">Var det är</div>
@@ -968,15 +837,19 @@ function openDetail(id){
       <div class="det-addr-street">${item.addr}</div>
       <div class="det-divider"></div>
       <div class="det-host">
-        <div class="det-host-logo">ABF</div>
-        <div><div class="det-host-name">Hosted av ${item.host}</div><div class="det-host-since">Arrangör i Huddinge Kommun</div></div>
+        <div class="det-host-logo" style="background:${col}">${item.host.split(' ').map(w=>w[0]).slice(0,3).join('')}</div>
+        <div>
+          <div class="det-host-name">Hosted av ${item.host}</div>
+          <div class="det-host-since">Arrangör i Huddinge</div>
+        </div>
       </div>
     </div>`;
   document.getElementById('detFlyBtn').onclick=()=>openMapsSheet(item);
-  document.getElementById('detJoinBtn').onclick=()=>openEventUrl(item);
+  document.getElementById('detJoinBtn').onclick=()=>openEventUrlDirect(item);
   document.getElementById('detBackBtn').onclick=closeDetail;
   document.getElementById('detBottom').classList.add('visible');
-  const ds=document.getElementById('detailScreen'); ds.classList.add('visible'); ds.scrollTop=0;
+  const ds=document.getElementById('detailScreen');
+  ds.classList.add('visible'); ds.scrollTop=0;
   if(detailMapInstance){detailMapInstance.remove();detailMapInstance=null;}
   setTimeout(()=>{
     const el=document.getElementById('detMapEl'); if(!el)return;
@@ -987,12 +860,14 @@ function openDetail(id){
     setTimeout(()=>detailMapInstance.invalidateSize(),50);
   },100);
 }
+
 function closeDetail(){
   document.getElementById('detailScreen').classList.remove('visible');
   document.getElementById('detBottom').classList.remove('visible');
+  if(detailMapInstance){detailMapInstance.remove();detailMapInstance=null;}
 }
 
-// ── ACTION SHEET ─────────────────────────────────────────────────
+// ── ACTION SHEET ───────────────────────────────────────────────────────
 function showActionSheet(opts){
   const bg=document.getElementById('actionSheetBg');
   const el=document.getElementById('actionSheet');
@@ -1008,27 +883,42 @@ function closeActionSheet(){
   document.getElementById('actionSheetBg').style.cssText='background:rgba(0,0,0,0);pointer-events:none';
   document.getElementById('actionSheet').style.transform='translateY(calc(100% + 12px))';
 }
-function actionSheetTap(i){ const o=document.getElementById('actionSheet')._opts[i]; closeActionSheet(); if(o?.action) o.action(); }
+function actionSheetTap(i){
+  const o=document.getElementById('actionSheet')._opts[i];
+  closeActionSheet(); if(o?.action) o.action();
+}
 function openMapsSheet(item){
   showActionSheet([
     {label:'🗺️ Öppna i Apple Kartor',action:()=>window.open(`https://maps.apple.com/?daddr=${item.lat},${item.lng}&dirflg=d`,'_blank')},
     {label:'📍 Öppna i Google Maps',action:()=>window.open(`https://www.google.com/maps/dir/?api=1&destination=${item.lat},${item.lng}`,'_blank')}
   ]);
 }
-function openEventUrl(item){
+function openEventUrl(itemJson){
+  const item=typeof itemJson==='string'?JSON.parse(itemJson):itemJson;
+  openEventUrlDirect(item);
+}
+function openEventUrlDirect(item){
+  if(!item.url){
+    showActionSheet([{label:`Kontakta ${item.host}`,subtitle:`Arrangör av ${item.name}`,bold:true,action:()=>{}}]);
+    return;
+  }
   const host=item.url.replace(/https?:\/\//,'').replace(/\/.*/,'');
   showActionSheet([{label:`Öppna ${host}`,subtitle:`Mer info om ${item.name}`,bold:true,action:()=>window.open(item.url,'_blank')}]);
 }
 
-// ── BOOT ─────────────────────────────────────────────────────────
+// ── BOOT ──────────────────────────────────────────────────────────────
 window.addEventListener('load',()=>{
-  initMap(); initFilterChips(); renderChips(); renderContent();
-  setupSheetDrag(); setupActiveCardSwipe();
-  requestAnimationFrame(()=>{
-    document.getElementById('sheet').style.transition='none';
-    collapseSheet();
-    requestAnimationFrame(()=>{ document.getElementById('sheet').style.transition=''; });
-  });
+  fetch('events.json')
+    .then(r=>r.json())
+    .then(data=>{
+      ITEMS=data;
+      ORGS_LIST=[...new Set(data.map(i=>i.host))].sort();
+      initMap();
+      initFilterChips();
+      renderChips();
+      renderCalendar();
+    })
+    .catch(err=>console.error('Kunde inte ladda events.json:',err));
 });
 </script>
 </body>
