@@ -93,10 +93,11 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
 /* ══ CARD PANEL ══ */
 #cardPanel{
   position:absolute;left:0;right:0;bottom:0;z-index:200;
-  background:linear-gradient(to top,rgba(0,0,0,.5) 0%,rgba(0,0,0,0) 100%);
-  padding-top:64px;
   transform:translateY(100%);
   transition:transform .38s cubic-bezier(.32,.94,.6,1);
+  /* gradient above cards */
+  background:linear-gradient(to top,rgba(0,0,0,.45) 0%,rgba(0,0,0,0) 100%);
+  padding-top:72px;
 }
 #cardPanel.visible{transform:translateY(0)}
 
@@ -111,34 +112,37 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
 #closeCardBtn svg{width:18px;height:18px}
 
 #cardScroll{
-  display:flex;gap:12px;overflow-x:auto;padding:0 16px calc(env(safe-area-inset-bottom,0px) + 88px) 16px;
+  display:flex;gap:12px;overflow-x:auto;
+  padding:0 16px calc(env(safe-area-inset-bottom,0px) + 100px) 16px;
   scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  align-items:stretch; /* alla kort samma höjd */
 }
 #cardScroll::-webkit-scrollbar{display:none}
+#cardScroll.single-card{overflow-x:hidden}
+#cardScroll.single-card .ev-card{width:calc(100vw - 32px)}
 
 /* ══ EVENT CARD ══ */
 .ev-card{
   flex-shrink:0;width:min(320px,calc(100vw - 48px));
   background:#fff;
   border-radius:24px;
-  box-shadow:0 4px 8px -1px rgba(0,0,0,.03),0 8px 16px -2px rgba(0,0,0,.03);
+  box-shadow:0 4px 8px -1px rgba(0,0,0,.06),0 16px 32px -4px rgba(0,0,0,.12);
   padding:8px;
   scroll-snap-align:start;cursor:pointer;
   display:flex;flex-direction:column;
+  height:340px; /* fast höjd = alla kort lika höga */
 }
 .ev-card-img{width:100%;height:128px;border-radius:16px;object-fit:cover;display:block;background:#e0e0e0;flex-shrink:0}
-.ev-card-body{padding:12px 8px 8px;flex:1;display:flex;flex-direction:column}
-.ev-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:14px}
+.ev-card-body{padding:12px 8px 8px;flex:1;display:flex;flex-direction:column;min-height:0}
+.ev-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}
 .ev-card-name{font-size:15px;font-weight:500;color:#000;line-height:1.2}
 .ev-card-desc{font-size:13px;color:rgba(0,0,0,.7);margin-top:2px}
-.ev-card-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.ev-card-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .ev-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:8px;font-size:13px;font-weight:500;background:rgba(0,0,0,.07);color:#000;white-space:nowrap}
 .ev-tag svg{width:14px;height:14px;opacity:.55;flex-shrink:0}
-.ev-card-btns{display:flex;gap:6px;margin-top:auto}
+.ev-card-btns{display:flex;gap:6px;margin-top:auto;flex-shrink:0}
 .btn-ghost{flex:1;padding:16px 8px;border-radius:56px;background:rgba(70,70,70,.1);border:none;font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:#000;cursor:pointer;white-space:nowrap}
 .btn-dark{flex:1;padding:16px 8px;border-radius:56px;background:#000;border:none;font-family:'Inter',sans-serif;font-size:15px;font-weight:500;color:#fff;cursor:pointer;white-space:nowrap}
-/* Ensam knapp → full bredd */
-.ev-card-btns .btn-ghost:only-child,.ev-card-btns .btn-dark:only-child{flex:1}
 .free-badge{display:inline-flex;align-items:center;padding:4px 8px;border-radius:8px;font-size:13px;font-weight:600;background:rgba(52,199,89,.15);color:#1a7a38}
 
 /* ══ FLOATING TAB BAR ══ */
@@ -551,18 +555,15 @@ input:checked+.toggle-track::after{transform:translateX(20px)}
   <div id="tabBar">
     <div id="tabPill">
       <button class="tab-btn active" data-tab="event" onclick="setTab('event')">
-        <!-- event icon: curtain/theater -->
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c3.5-.5 6.5-.5 10 0 3.5-.5 6.5-.5 10 0v13c-3.5-.5-6.5-.5-10 0C8.5 18.5 5.5 18.5 2 19V6z"/><path d="M12 6v13"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.9089 4.00009C8.90016 3.99997 8.89139 3.99997 8.88261 4.00009H5C3.34315 4.00009 2 5.34323 2 7.00009V17.0001C2 18.6569 3.34315 20.0001 5 20.0001H8C8.54519 20.0001 8.98991 19.5634 8.99983 19.0183C8.99995 19.0122 9.00005 19.0062 9.00014 19.0001H14.9999C15 19.0062 15.0001 19.0122 15.0002 19.0183C15.0101 19.5634 15.4548 20.0001 16 20.0001H19C20.6569 20.0001 22 18.6569 22 17.0001V7.00009C22 5.34323 20.6569 4.00009 19 4.00009H15.1174C15.1086 3.99997 15.0998 3.99997 15.0911 4.00009H8.9089ZM16.0239 6.00009C15.9129 7.90884 16.1888 9.28648 16.8386 10.3166C17.4317 11.2569 18.4147 12.0298 20 12.6295V7.00009C20 6.4478 19.5523 6.00009 19 6.00009H16.0239ZM20 14.9928V17.0001C20 17.5524 19.5523 18.0001 19 18.0001H17.0794C17.2288 17.1936 17.5788 16.4906 18.0664 15.9713C18.556 15.45 19.2052 15.0889 20 14.9928ZM6.92056 18.0001C6.77118 17.1936 6.42121 16.4906 5.93359 15.9713C5.444 15.45 4.79484 15.0889 4 14.9928V17.0001C4 17.5524 4.44772 18.0001 5 18.0001H6.92056ZM4 12.6295V7.00009C4 6.4478 4.44772 6.00009 5 6.00009H7.97611C8.0871 7.90884 7.81117 9.28648 7.16142 10.3166C6.5683 11.2569 5.58534 12.0298 4 12.6295Z" fill="currentColor"/></svg>
         Event
       </button>
       <button class="tab-btn" data-tab="konst" onclick="setTab('konst')">
-        <!-- konst icon: palette -->
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 3C3.567 3 2 4.567 2 6.5V17.5C2 19.433 3.567 21 5.5 21H18C19.6569 21 21 19.6569 21 18V14C21 13.4477 20.5523 13 20 13C19.4477 13 19 13.4477 19 14V18C19 18.5523 18.5523 19 18 19H5.5C4.67157 19 4 18.3284 4 17.5C4 16.6716 4.67157 16 5.5 16H7C7.55228 16 8 15.5523 8 15V8H10C10.5523 8 11 7.55228 11 7C11 6.44772 10.5523 6 10 6H8V4C8 3.44772 7.55228 3 7 3H5.5Z" fill="currentColor"/><path d="M17 12.01C16.84 12.01 16.69 11.97 16.55 11.9C16.41 11.83 13 10.09 13 7.01001C13 4.80001 14.79 3.01001 17 3.01001C19.21 3.01001 21 4.80001 21 7.01001C21 10.09 17.59 11.83 17.45 11.9C17.31 11.97 17.16 12.01 17 12.01Z" fill="currentColor"/></svg>
         Konst
       </button>
       <button class="tab-btn" data-tab="kalender" onclick="setTab('kalender')">
-        <!-- kalender icon: calendar -->
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 2C8.55228 2 9 2.44772 9 3V4H15V3C15 2.44772 15.4477 2 16 2C16.5523 2 17 2.44772 17 3V4H18C19.6569 4 21 5.34315 21 7V10C21 10.5523 20.5523 11 20 11C19.4477 11 19 10.5523 19 10H5V18C5 18.5523 5.44772 19 6 19H10C10.5523 19 11 19.4477 11 20C11 20.5523 10.5523 21 10 21H6C4.34315 21 3 19.6569 3 18V7C3 5.34315 4.34315 4 6 4H7V3C7 2.44772 7.44772 2 8 2Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M18.4142 15.5858C17.6332 14.8047 16.3668 14.8047 15.5858 15.5858C14.8047 16.3668 14.8047 17.6332 15.5858 18.4142C16.3668 19.1953 17.6332 19.1953 18.4142 18.4142C19.1953 17.6332 19.1953 16.3668 18.4142 15.5858ZM14.1716 14.1716C15.7337 12.6095 18.2663 12.6095 19.8284 14.1716C21.1464 15.4895 21.3524 17.4983 20.4464 19.0322L21.7071 20.2929C22.0976 20.6834 22.0976 21.3166 21.7071 21.7071C21.3166 22.0976 20.6834 22.0976 20.2929 21.7071L19.0322 20.4464C17.4983 21.3524 15.4895 21.1464 14.1716 19.8284C12.6095 18.2663 12.6095 15.7337 14.1716 14.1716Z" fill="currentColor"/></svg>
         Kalender
       </button>
     </div>
@@ -677,6 +678,9 @@ function showCards(ids){
     const item=ITEMS.find(x=>x.id===id); if(!item)return'';
     return evCardHtml(item);
   }).join('');
+
+  // Single card → full width
+  scroll.classList.toggle('single-card', activeIds.length===1);
 
   // Show panel, hide tab bar, show back btn
   document.getElementById('cardPanel').classList.add('visible');
@@ -1032,15 +1036,15 @@ function openDetail(id){
       </div>
       <div class="det-stats">
         <div class="det-stat">
-          <div class="det-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+          <div class="det-stat-icon" style="background:none"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><path d="M12 3C12.8284 3 13.5 3.67157 13.5 4.5V6H22.5V4.5C22.5 3.67157 23.1716 3 24 3C24.8284 3 25.5 3.67157 25.5 4.5V6H27C29.4853 6 31.5 8.01472 31.5 10.5V13.5H4.5V10.5C4.5 8.01472 6.51472 6 9 6H10.5V4.5C10.5 3.67157 11.1716 3 12 3Z" fill="#068A99"/><path d="M4.5 27V16.5H31.5V27C31.5 29.4853 29.4853 31.5 27 31.5H9C6.51472 31.5 4.5 29.4853 4.5 27Z" fill="#47C1CE" fill-opacity="0.4"/></svg></div>
           <div class="det-stat-val">${item.date}</div>
         </div>
         <div class="det-stat">
-          <div class="det-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg></div>
+          <div class="det-stat-icon" style="background:none"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M6 15C6 8.37258 11.3726 3 18 3C24.6274 3 30 8.37258 30 15C30 18.7112 28.3588 22.1382 26.446 24.8911C24.5217 27.6604 22.2239 29.8893 20.6883 31.2357C19.1376 32.5953 16.8624 32.5953 15.3117 31.2357C13.7761 29.8893 11.4783 27.6604 9.55402 24.8911C7.6412 22.1382 6 18.7112 6 15ZM17.9967 18.75C20.0678 18.75 21.7467 17.0711 21.7467 15C21.7467 12.9289 20.0678 11.25 17.9967 11.25C15.9256 11.25 14.2467 12.9289 14.2467 15C14.2467 17.0711 15.9256 18.75 17.9967 18.75Z" fill="#47C1CE" fill-opacity="0.4"/><path fill-rule="evenodd" clip-rule="evenodd" d="M17.9967 18.75C20.0678 18.75 21.7467 17.0711 21.7467 15C21.7467 12.9289 20.0678 11.25 17.9967 11.25C15.9256 11.25 14.2467 12.9289 14.2467 15C14.2467 17.0711 15.9256 18.75 17.9967 18.75Z" fill="#068A99"/></svg></div>
           <div class="det-stat-val">${item.loc}</div>
         </div>
         <div class="det-stat">
-          <div class="det-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <div class="det-stat-icon" style="background:none"><svg width="36" height="36" viewBox="0 0 36 36" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M18 33C26.2843 33 33 26.2843 33 18C33 9.71573 26.2843 3 18 3C9.71573 3 3 9.71573 3 18C3 26.2843 9.71573 33 18 33ZM19.5 12C19.5 11.1716 18.8284 10.5 18 10.5C17.1716 10.5 16.5 11.1716 16.5 12V18C16.5 18.3978 16.658 18.7794 16.9393 19.0607L20.6893 22.8107C21.2751 23.3964 22.2249 23.3964 22.8107 22.8107C23.3964 22.2249 23.3964 21.2751 22.8107 20.6893L19.5 17.3787V12Z" fill="#47C1CE" fill-opacity="0.4"/><path fill-rule="evenodd" clip-rule="evenodd" d="M18 10.5C18.8284 10.5 19.5 11.1716 19.5 12V17.3787L22.8107 20.6893C23.3964 21.2751 23.3964 22.2249 22.8107 22.8107C22.2249 23.3964 21.2751 23.3964 20.6893 22.8107L16.9393 19.0607C16.658 18.7794 16.5 18.3978 16.5 18V12C16.5 11.1716 17.1716 10.5 18 10.5Z" fill="#068A99"/></svg></div>
           <div class="det-stat-val">${item.time}</div>
         </div>
       </div>
