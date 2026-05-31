@@ -364,9 +364,18 @@ input:checked+.toggle-track::after{transform:translateX(20px)}
   position:relative;transition:background .12s;
 }
 .dp-day:disabled{color:rgba(0,0,0,.2);cursor:default}
-.dp-day.has-events::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:#068a99}
 .dp-day.selected{background:#068a99;color:#fff}
-.dp-day.selected::after{background:#fff}
+.dp-day-count{
+  position:absolute;top:-3px;right:-3px;
+  min-width:17px;height:17px;padding:0 4px;
+  border-radius:99px;
+  background:rgba(6,138,153,.15);
+  color:#068a99;
+  font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  line-height:1;
+}
+.dp-day.selected .dp-day-count{background:rgba(255,255,255,.25);color:#fff}
 .dp-day.today{font-weight:700}
 .dp-day.empty{pointer-events:none}
 .dp-clear{display:block;width:calc(100% - 40px);margin:4px 20px 0;padding:14px;border-radius:56px;background:rgba(0,0,0,.07);border:none;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:#000;cursor:pointer}
@@ -906,13 +915,15 @@ function renderDpCalendar(){
   // Convert Sunday=0 to Monday=0
   const offset=(firstDay+6)%7;
   const daysInMonth=new Date(dpYear,dpMonth+1,0).getDate();
-  // Get days that have events
-  const eventDays=new Set();
+  // Count events per day
+  const eventCount={};
   ITEMS.forEach(item=>{
     const p=parseEventDate(item.date); if(!p) return;
     for(let d=new Date(p.start);d<=p.end;d.setDate(d.getDate()+1)){
-      if(d.getFullYear()===dpYear && d.getMonth()===dpMonth)
-        eventDays.add(d.getDate());
+      if(d.getFullYear()===dpYear && d.getMonth()===dpMonth){
+        const day=d.getDate();
+        eventCount[day]=(eventCount[day]||0)+1;
+      }
     }
   });
   const today=new Date(); const isThisMonth=today.getFullYear()===dpYear&&today.getMonth()===dpMonth;
@@ -920,9 +931,10 @@ function renderDpCalendar(){
   for(let i=0;i<offset;i++) html+=`<div class="dp-day empty"></div>`;
   for(let d=1;d<=daysInMonth;d++){
     const isSelected=selectedDate&&selectedDate.getFullYear()===dpYear&&selectedDate.getMonth()===dpMonth&&selectedDate.getDate()===d;
-    const hasEv=eventDays.has(d);
+    const cnt=eventCount[d]||0;
     const isToday=isThisMonth&&today.getDate()===d;
-    html+=`<button class="dp-day${isSelected?' selected':''}${hasEv?' has-events':''}${isToday?' today':''}" onclick="selectDay(${dpYear},${dpMonth},${d})">${d}</button>`;
+    const badge=cnt>0?`<span class="dp-day-count">${cnt}</span>`:'';
+    html+=`<button class="dp-day${isSelected?' selected':''}${isToday?' today':''}" onclick="selectDay(${dpYear},${dpMonth},${d})">${d}${badge}</button>`;
   }
   document.getElementById('dpDays').innerHTML=html;
   document.getElementById('dpClearBtn').style.display=selectedDate?'block':'none';
