@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Huddinge Karta — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
+body{font-family:'Inter',sans-serif;background:#f2f2f7;color:#000;min-height:100vh}
+
+/* ── TOKENS ── */
+:root{
+  --event:#bf5917;--event-bg:rgba(209,96,23,.12);
+  --konst:#068a99;--konst-bg:rgba(71,193,206,.12);
+  --motes:#c0136f;--motes-bg:rgba(209,66,142,.12);
+  --musik:#c3a523;--musik-bg:rgba(248,216,75,.2);
+  --radius:16px;--card-shadow:0 2px 16px rgba(0,0,0,.07);
+}
+
+/* ── LOGIN ── */
+#loginScreen{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
+  z-index:1000;
+}
+.login-box{
+  background:#fff;border-radius:28px;padding:48px 40px;width:min(400px,92vw);
+  box-shadow:0 40px 100px rgba(0,0,0,.4);
+}
+.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:32px}
+.login-logo-mark{
+  width:48px;height:48px;border-radius:14px;background:#000;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.login-logo-mark svg{width:28px;height:28px}
+.login-logo-text{font-size:20px;font-weight:700;color:#000;line-height:1.1}
+.login-logo-sub{font-size:13px;color:rgba(0,0,0,.4);font-weight:400;margin-top:2px}
+.login-title{font-size:26px;font-weight:700;margin-bottom:6px}
+.login-sub{font-size:14px;color:rgba(0,0,0,.5);margin-bottom:32px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;font-weight:600;color:rgba(0,0,0,.5);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+.field input{
+  width:100%;height:52px;border-radius:14px;border:1.5px solid rgba(0,0,0,.1);
+  padding:0 16px;font-family:'Inter',sans-serif;font-size:16px;color:#000;
+  outline:none;transition:border-color .2s;background:#fafafa;
+}
+.field input:focus{border-color:#000;background:#fff}
+.login-btn{
+  width:100%;height:52px;border-radius:14px;background:#000;border:none;
+  font-family:'Inter',sans-serif;font-size:16px;font-weight:600;color:#fff;
+  cursor:pointer;margin-top:8px;transition:opacity .2s;
+}
+.login-btn:hover{opacity:.85}
+.login-err{background:rgba(255,59,48,.1);color:#ff3b30;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:500;margin-top:12px;display:none}
+
+/* ── APP SHELL ── */
+#app{display:none;min-height:100vh}
+@media(min-width:768px){#app{display:flex}}
+
+/* ── SIDEBAR ── */
+#sidebar{
+  width:260px;flex-shrink:0;background:#fff;min-height:100vh;
+  border-right:.5px solid rgba(0,0,0,.08);
+  display:flex;flex-direction:column;position:sticky;top:0;
+}
+.sidebar-head{padding:28px 24px 20px;border-bottom:.5px solid rgba(0,0,0,.06)}
+.sidebar-logo{display:flex;align-items:center;gap:10px}
+.sidebar-logo-mark{width:36px;height:36px;border-radius:10px;background:#000;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar-logo-mark svg{width:20px;height:20px}
+.sidebar-logo-text{font-size:15px;font-weight:700;line-height:1.1}
+.sidebar-logo-sub{font-size:11px;color:rgba(0,0,0,.4)}
+.sidebar-nav{padding:16px 12px;flex:1}
+.nav-section-title{font-size:11px;font-weight:600;color:rgba(0,0,0,.35);text-transform:uppercase;letter-spacing:.06em;padding:0 12px;margin-bottom:6px;margin-top:12px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+  cursor:pointer;font-size:14px;font-weight:500;color:rgba(0,0,0,.7);
+  transition:background .15s,color .15s;margin-bottom:2px;
+}
+.nav-item:hover{background:rgba(0,0,0,.05)}
+.nav-item.active{background:#000;color:#fff}
+.nav-item svg{width:18px;height:18px;flex-shrink:0}
+.nav-count{margin-left:auto;background:rgba(0,0,0,.08);border-radius:20px;padding:2px 8px;font-size:12px;font-weight:600}
+.nav-item.active .nav-count{background:rgba(255,255,255,.2)}
+.sidebar-foot{padding:16px 12px;border-top:.5px solid rgba(0,0,0,.06)}
+.logout-btn{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+  cursor:pointer;font-size:14px;font-weight:500;color:rgba(0,0,0,.5);width:100%;
+  background:none;border:none;font-family:'Inter',sans-serif;transition:background .15s;
+}
+.logout-btn:hover{background:rgba(0,0,0,.05)}
+
+/* ── MAIN ── */
+#main{flex:1;min-width:0;padding:32px}
+.page{display:none}
+.page.active{display:block}
+
+/* ── PAGE HEADER ── */
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:gap;gap:12px}
+.page-title{font-size:28px;font-weight:700}
+.page-sub{font-size:14px;color:rgba(0,0,0,.45);margin-top:3px}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 20px;border-radius:12px;background:#000;border:none;
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#fff;
+  cursor:pointer;transition:opacity .2s;white-space:nowrap;flex-shrink:0;
+}
+.btn-primary:hover{opacity:.82}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 20px;border-radius:12px;background:rgba(0,0,0,.06);border:none;
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#000;
+  cursor:pointer;transition:background .15s;white-space:nowrap;
+}
+.btn-ghost:hover{background:rgba(0,0,0,.1)}
+.btn-danger{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 14px;border-radius:10px;background:rgba(255,59,48,.1);border:none;
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#ff3b30;
+  cursor:pointer;transition:background .15s;
+}
+.btn-danger:hover{background:rgba(255,59,48,.18)}
+
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:28px}
+.stat-card{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--card-shadow)}
+.stat-num{font-size:32px;font-weight:700;line-height:1}
+.stat-label{font-size:13px;color:rgba(0,0,0,.45);font-weight:500;margin-top:4px}
+.stat-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+
+/* ── FILTER BAR ── */
+.filter-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.filter-pill{
+  height:34px;padding:0 14px;border-radius:40px;border:.5px solid rgba(0,0,0,.14);
+  background:#fff;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;
+  color:rgba(0,0,0,.7);cursor:pointer;transition:all .15s;
+}
+.filter-pill.on{background:#000;color:#fff;border-color:#000}
+.search-box{
+  flex:1;min-width:180px;height:36px;border-radius:40px;border:.5px solid rgba(0,0,0,.14);
+  padding:0 14px 0 36px;font-family:'Inter',sans-serif;font-size:13px;
+  background:#fff url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='6.5' cy='6.5' r='4.5' stroke='%23999' stroke-width='1.5'/%3E%3Cpath d='M13 13l-2.5-2.5' stroke='%23999' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") 12px center no-repeat;
+  outline:none;
+}
+
+/* ── ITEM LIST ── */
+.items-grid{display:flex;flex-direction:column;gap:10px}
+.item-card{
+  background:#fff;border-radius:var(--radius);
+  display:flex;align-items:center;gap:16px;padding:16px;
+  box-shadow:var(--card-shadow);transition:box-shadow .15s;
+}
+.item-card:hover{box-shadow:0 4px 24px rgba(0,0,0,.1)}
+.item-thumb{width:72px;height:72px;border-radius:12px;object-fit:cover;background:#eee;flex-shrink:0}
+.item-info{flex:1;min-width:0}
+.item-name{font-size:15px;font-weight:600;color:#000;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cat-badge{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:20px;font-size:11px;font-weight:600}
+.area-badge{font-size:12px;color:rgba(0,0,0,.45)}
+.free-badge{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(52,199,89,.12);color:#1a7a38}
+.item-desc{font-size:13px;color:rgba(0,0,0,.5);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-actions{display:flex;gap:8px;flex-shrink:0}
+.edit-btn{
+  padding:8px 14px;border-radius:10px;background:rgba(0,0,0,.06);border:none;
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#000;cursor:pointer;transition:background .15s;
+}
+.edit-btn:hover{background:rgba(0,0,0,.12)}
+
+/* ── FORM PAGE ── */
+.form-back{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:15px;font-weight:500;color:rgba(0,0,0,.5);margin-bottom:24px;width:fit-content}
+.form-back:hover{color:#000}
+.form-back svg{width:18px;height:18px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:900px){.form-grid{grid-template-columns:1fr}}
+.form-card{background:#fff;border-radius:var(--radius);padding:24px;box-shadow:var(--card-shadow)}
+.form-card-title{font-size:16px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.form-card-title svg{width:18px;height:18px;opacity:.5}
+.form-field{margin-bottom:18px}
+.form-field:last-child{margin-bottom:0}
+.form-label{font-size:12px;font-weight:600;color:rgba(0,0,0,.45);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px}
+.form-input,.form-select,.form-textarea{
+  width:100%;border:1.5px solid rgba(0,0,0,.1);border-radius:12px;
+  padding:11px 14px;font-family:'Inter',sans-serif;font-size:15px;color:#000;
+  background:#fafafa;outline:none;transition:border-color .2s,background .2s;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:#000;background:#fff}
+.form-textarea{resize:vertical;min-height:100px;line-height:1.5}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer}
+.form-hint{font-size:12px;color:rgba(0,0,0,.4);margin-top:5px}
+/* Category pills */
+.cat-pills{display:flex;gap:8px;flex-wrap:wrap}
+.cat-pill{
+  padding:8px 16px;border-radius:40px;border:1.5px solid rgba(0,0,0,.1);
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;
+  background:#fff;transition:all .15s;
+}
+.cat-pill.on-event{background:var(--event-bg);color:var(--event);border-color:var(--event)}
+.cat-pill.on-konst{background:var(--konst-bg);color:var(--konst);border-color:var(--konst)}
+.cat-pill.on-motes{background:var(--motes-bg);color:var(--motes);border-color:var(--motes)}
+.cat-pill.on-musik{background:var(--musik-bg);color:var(--musik);border-color:var(--musik)}
+/* Toggle */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:.5px solid rgba(0,0,0,.07)}
+.toggle-row:last-child{border-bottom:none;padding-bottom:0}
+.toggle-label{font-size:15px;font-weight:500;color:#000}
+.toggle-sub{font-size:13px;color:rgba(0,0,0,.45);margin-top:2px}
+.toggle-sw{position:relative;width:51px;height:31px;flex-shrink:0}
+.toggle-sw input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;border-radius:31px;background:rgba(0,0,0,.15);cursor:pointer;transition:background .2s}
+.toggle-track::after{content:'';position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:transform .2s}
+input:checked+.toggle-track{background:#34c759}
+input:checked+.toggle-track::after{transform:translateX(20px)}
+/* ── DATE / TIME / ADDRESS / UPLOAD ── */
+.time-row{display:grid;grid-template-columns:1fr 22px 1fr;gap:8px;align-items:center}
+.time-sep{font-size:20px;color:rgba(0,0,0,.25);text-align:center;padding-top:9px}
+.recurring-row{display:flex;align-items:center;gap:8px;margin-top:10px;cursor:pointer}
+.recurring-row input{width:16px;height:16px;cursor:pointer;accent-color:#000}
+.recurring-row span{font-size:14px;font-weight:500;color:rgba(0,0,0,.55)}
+.addr-wrap{position:relative}
+.addr-spinner{position:absolute;right:14px;top:13px;width:18px;height:18px;border:2px solid rgba(0,0,0,.12);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.addr-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:200;background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.14);border:.5px solid rgba(0,0,0,.08);overflow:hidden;display:none}
+.addr-result{padding:11px 14px;cursor:pointer;font-size:14px;color:#000;border-bottom:.5px solid rgba(0,0,0,.06);transition:background .1s}
+.addr-result:last-child{border-bottom:none}
+.addr-result:hover{background:#f5f5f5}
+.addr-result-name{font-weight:600}
+.addr-result-sub{font-size:12px;color:rgba(0,0,0,.4);margin-top:1px}
+.addr-selected{display:none;align-items:center;gap:8px;background:#f0f7ff;border:1.5px solid #c8dff8;border-radius:12px;padding:10px 14px;font-size:14px;font-weight:500;color:#1a5fa8;margin-top:8px}
+.addr-selected svg{width:16px;height:16px;flex-shrink:0}
+.addr-clear{margin-left:auto;background:none;border:none;cursor:pointer;font-size:20px;color:rgba(0,0,0,.3);line-height:1}
+.addr-coords{font-size:12px;color:rgba(0,0,0,.35);margin-top:5px}
+.upload-zone{border:2px dashed rgba(0,0,0,.16);border-radius:16px;padding:28px 16px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;position:relative;background:#fafafa}
+.upload-zone:hover,.upload-zone.drag-over{border-color:#000;background:#f3f3f3}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-zone svg{opacity:.3;margin:0 auto 8px;display:block}
+.upload-zone-title{font-size:15px;font-weight:600;color:rgba(0,0,0,.6);margin-bottom:3px}
+.upload-zone-sub{font-size:13px;color:rgba(0,0,0,.35)}
+.upload-preview-img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:14px;display:block;background:#eee;margin-bottom:10px}
+.upload-btns{display:flex;gap:8px;margin-bottom:10px}
+.upload-btn{flex:1;padding:10px;border-radius:10px;background:rgba(0,0,0,.07);border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
+.upload-btn:hover{background:rgba(0,0,0,.12)}
+.upload-url-row{display:flex;gap:8px;align-items:center}
+.upload-url-row input{flex:1;border:1.5px solid rgba(0,0,0,.1);border-radius:10px;padding:10px 12px;font-family:'Inter',sans-serif;font-size:14px;outline:none;background:#fafafa}
+.upload-url-row input:focus{border-color:#000;background:#fff}
+.upload-url-btn{padding:10px 16px;border-radius:10px;background:#000;border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#fff;cursor:pointer;white-space:nowrap}
+/* Form footer */
+.form-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:28px}
+
+/* ── PREVIEW CARD ── */
+.preview-wrap{position:sticky;top:24px}
+.preview-label{font-size:12px;font-weight:600;color:rgba(0,0,0,.4);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.preview-phone{
+  width:100%;max-width:320px;border-radius:28px;overflow:hidden;
+  box-shadow:0 16px 48px rgba(0,0,0,.18);background:#f6f6f6;
+  border:8px solid #111;
+}
+.preview-img{width:100%;height:130px;object-fit:cover;background:#e0e0e0;display:block}
+.preview-body{padding:14px}
+.preview-cat{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:40px;font-size:11px;font-weight:600;margin-bottom:8px}
+.preview-name{font-size:18px;font-weight:700;color:#000;line-height:1.2;margin-bottom:4px}
+.preview-desc{font-size:13px;color:rgba(0,0,0,.6);margin-bottom:12px}
+.preview-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:12px}
+.preview-stat{background:rgba(0,0,0,.05);border-radius:8px;padding:8px;text-align:center;font-size:11px;font-weight:600;color:#000}
+.preview-btns{display:flex;gap:6px}
+.preview-btn-g{flex:1;padding:11px 8px;border-radius:50px;background:rgba(0,0,0,.08);font-size:12px;font-weight:600;text-align:center;color:#000}
+.preview-btn-b{flex:1;padding:11px 8px;border-radius:50px;background:#000;font-size:12px;font-weight:600;text-align:center;color:#fff}
+
+/* ── MOBILE TOPBAR (mobile only) ── */
+.mobile-bar{display:none;align-items:center;justify-content:space-between;padding:16px;background:#fff;border-bottom:.5px solid rgba(0,0,0,.08);position:sticky;top:0;z-index:100}
+@media(max-width:767px){
+  .mobile-bar{display:flex}
+  #sidebar{display:none}
+  #main{padding:16px}
+  .form-grid{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr 1fr}
+}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:60px 24px;color:rgba(0,0,0,.35)}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-text{font-size:15px;font-weight:500}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:#000;color:#fff;padding:12px 24px;border-radius:40px;
+  font-size:14px;font-weight:500;z-index:9999;
+  transition:transform .3s cubic-bezier(.32,.94,.6,1);pointer-events:none;
+  white-space:nowrap;
+}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ── DELETE CONFIRM ── */
+#confirmOverlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:2000;display:none;align-items:center;justify-content:center}
+#confirmOverlay.show{display:flex}
+.confirm-box{background:#fff;border-radius:20px;padding:28px;width:min(360px,90vw);text-align:center}
+.confirm-title{font-size:18px;font-weight:700;margin-bottom:8px}
+.confirm-sub{font-size:14px;color:rgba(0,0,0,.5);margin-bottom:24px}
+.confirm-btns{display:flex;gap:8px}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
+      </div>
+      <div>
+        <div class="login-logo-text">Huddinge Karta</div>
+        <div class="login-logo-sub">Aktörsportal</div>
+      </div>
+    </div>
+    <div class="login-title">Logga in</div>
+    <div class="login-sub">Hantera ditt innehåll i Huddinge Karta</div>
+    <div class="field">
+      <label>Användarnamn</label>
+      <input type="text" id="loginUser" placeholder="admin" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Lösenord</label>
+      <input type="password" id="loginPass" placeholder="••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Logga in</button>
+    <div class="login-err" id="loginErr">Felaktigt användarnamn eller lösenord</div>
+  </div>
+</div>
+
+<!-- ── APP ── -->
+<div id="app">
+  <!-- Mobile bar -->
+  <div class="mobile-bar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
+      </div>
+      <div><div class="sidebar-logo-text">Huddinge Admin</div></div>
+    </div>
+    <button onclick="showPage('list')" style="background:none;border:none;font-size:14px;font-weight:600;cursor:pointer">← Lista</button>
+  </div>
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
+        </div>
+        <div>
+          <div class="sidebar-logo-text">Huddinge Karta</div>
+          <div class="sidebar-logo-sub">Aktörsportal</div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-title">Innehåll</div>
+      <div class="nav-item active" id="navList" onclick="showPage('list')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        Alla inlägg
+        <span class="nav-count" id="navCount">0</span>
+      </div>
+      <div class="nav-item" id="navAdd" onclick="newItem()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+        Lägg till nytt
+      </div>
+      <div class="nav-section-title">Kategorier</div>
+      <div class="nav-item" onclick="filterNav('event')">
+        <span style="width:10px;height:10px;border-radius:50%;background:var(--event);flex-shrink:0;display:inline-block"></span>
+        Event
+      </div>
+      <div class="nav-item" onclick="filterNav('konst')">
+        <span style="width:10px;height:10px;border-radius:50%;background:var(--konst);flex-shrink:0;display:inline-block"></span>
+        Konst
+      </div>
+      <div class="nav-item" onclick="filterNav('motes')">
+        <span style="width:10px;height:10px;border-radius:50%;background:var(--motes);flex-shrink:0;display:inline-block"></span>
+        Mötesplats
+      </div>
+      <div class="nav-item" onclick="filterNav('musik')">
+        <span style="width:10px;height:10px;border-radius:50%;background:var(--musik);flex-shrink:0;display:inline-block"></span>
+        Musik
+      </div>
+    </div>
+    <div class="sidebar-foot">
+      <button class="logout-btn" onclick="doLogout()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Logga ut (admin)
+      </button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div id="main">
+
+    <!-- LIST PAGE -->
+    <div class="page active" id="pagelist">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Alla inlägg</div>
+          <div class="page-sub" id="listSub">Laddar...</div>
+        </div>
+        <button class="btn-primary" onclick="newItem()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M8 2v12M2 8h12"/></svg>
+          Lägg till nytt
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid" id="statsGrid"></div>
+
+      <!-- Filter bar -->
+      <div class="filter-bar">
+        <input class="search-box" type="text" placeholder="Sök på namn eller plats..." oninput="renderList(this.value)">
+        <button class="filter-pill" id="fpAll" onclick="filterNav(null)">Alla</button>
+        <button class="filter-pill" onclick="filterNav('event')" style="color:var(--event)">Event</button>
+        <button class="filter-pill" onclick="filterNav('konst')" style="color:var(--konst)">Konst</button>
+        <button class="filter-pill" onclick="filterNav('motes')" style="color:var(--motes)">Mötesplats</button>
+        <button class="filter-pill" onclick="filterNav('musik')" style="color:var(--musik)">Musik</button>
+      </div>
+
+      <div class="items-grid" id="itemsGrid"></div>
+    </div>
+
+    <!-- FORM PAGE (add/edit) -->
+    <div class="page" id="pageform">
+      <div class="form-back" onclick="showPage('list')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M5 12l7 7M5 12l7-7"/></svg>
+        Tillbaka till listan
+      </div>
+      <div class="page-head">
+        <div>
+          <div class="page-title" id="formTitle">Nytt inlägg</div>
+          <div class="page-sub">Fyll i informationen nedan</div>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <!-- LEFT COLUMN -->
+        <div>
+          <!-- Grundinfo -->
+          <div class="form-card" style="margin-bottom:20px">
+            <div class="form-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Grundinformation
+            </div>
+            <div class="form-field">
+              <label class="form-label">Namn *</label>
+              <input class="form-input" type="text" id="fName" placeholder="T.ex. Flemingsberg Tour">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Kort beskrivning *</label>
+              <input class="form-input" type="text" id="fDesc" placeholder="En rad om evenemanget" maxlength="80">
+              <div class="form-hint">Visas under titeln i kartvy. Max 80 tecken.</div>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Lång beskrivning</label>
+              <textarea class="form-textarea" id="fLongDesc" placeholder="Beskriv evenemanget mer utförligt..."></textarea>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Kategori *</label>
+              <div class="cat-pills">
+                <button class="cat-pill" data-cat="event" onclick="selectCatForm('event')">Event</button>
+                <button class="cat-pill" data-cat="konst" onclick="selectCatForm('konst')">Konst</button>
+                <button class="cat-pill" data-cat="motes" onclick="selectCatForm('motes')">Mötesplats</button>
+                <button class="cat-pill" data-cat="musik" onclick="selectCatForm('musik')">Musik</button>
+              </div>
+              <input type="hidden" id="fCat">
+            </div>
+          </div>
+
+          <!-- Tid & Plats -->
+          <div class="form-card" style="margin-bottom:20px">
+            <div class="form-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              Tid & Plats
+            </div>
+            <div class="form-field">
+              <label class="form-label">Datum</label>
+              <input class="form-input" type="date" id="fDate" oninput="updatePreview()">
+              <label class="recurring-row">
+                <input type="checkbox" id="fRecurring" onchange="toggleRecurring()">
+                <span>Löpande / Permanent (inget specifikt datum)</span>
+              </label>
+              <input type="hidden" id="fDateText">
+            </div>
+            <div class="form-field" id="timeField">
+              <label class="form-label">Tid</label>
+              <div class="time-row">
+                <input class="form-input" type="time" id="fTimeStart" oninput="updatePreview()">
+                <div class="time-sep">–</div>
+                <input class="form-input" type="time" id="fTimeEnd" oninput="updatePreview()">
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Sök plats / adress</label>
+              <div class="addr-wrap">
+                <input class="form-input" type="text" id="fAddrSearch" placeholder="T.ex. Flemingsberg bibliotek, Huddinge" autocomplete="off" oninput="onAddrInput()" onfocus="onAddrInput()">
+                <div class="addr-spinner" id="addrSpinner"></div>
+                <div class="addr-dropdown" id="addrDropdown"></div>
+              </div>
+              <div class="addr-selected" id="addrSelected">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
+                <span id="addrSelectedText"></span>
+                <button class="addr-clear" onclick="clearAddr()">×</button>
+              </div>
+              <div class="addr-coords" id="addrCoords"></div>
+              <input type="hidden" id="fLoc">
+              <input type="hidden" id="fAddr">
+              <input type="hidden" id="fLat">
+              <input type="hidden" id="fLng">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Område (filter)</label>
+              <select class="form-select" id="fArea">
+                <option value="">Välj område</option>
+                <option value="flemingsberg">Flemingsberg</option>
+                <option value="huddinge">Huddinge</option>
+                <option value="skogas">Skogås</option>
+                <option value="sjodalen">Sjödalen</option>
+                <option value="glomsta">Glömsta</option>
+                <option value="vistaberg">Vistaberg</option>
+                <option value="lida">Lida</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Organisatör & Länk -->
+          <div class="form-card" style="margin-bottom:20px">
+            <div class="form-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              Organisatör
+            </div>
+            <div class="form-field">
+              <label class="form-label">Organisatör (filter)</label>
+              <select class="form-select" id="fHost">
+                <option value="">Välj organisatör</option>
+                <option>ABF</option>
+                <option>Huddinge Kommun</option>
+                <option>KTH</option>
+                <option>Naturskyddsföreningen</option>
+                <option>Stadsbiblioteket</option>
+                <option>Huddinge Musikskola</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Extern länk (för "Ansök att gå med")</label>
+              <input class="form-input" type="url" id="fUrl" placeholder="https://www.abf.se/evenemang/...">
+              <div class="form-hint">Öppnas i Safari när användaren trycker "Ansök att gå med".</div>
+            </div>
+          </div>
+
+          <!-- Bild -->
+          <div class="form-card" style="margin-bottom:20px">
+            <div class="form-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              Bild
+            </div>
+            <div class="form-field">
+              <!-- Preview (hidden until image set) -->
+              <div id="imgPreviewArea" style="display:none">
+                <img class="upload-preview-img" id="imgPreviewEl" src="" alt="">
+                <div class="upload-btns">
+                  <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Byt bild från dator</button>
+                  <button class="upload-btn" onclick="clearImage()" style="color:#ff3b30">Ta bort</button>
+                </div>
+              </div>
+              <!-- Drop zone (shown when no image) -->
+              <div class="upload-zone" id="uploadZone">
+                <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                <div class="upload-zone-title">Dra och släpp bild här</div>
+                <div class="upload-zone-sub">eller klicka för att välja från datorn · JPG, PNG, WEBP</div>
+              </div>
+              <!-- URL fallback -->
+              <div style="margin-top:12px">
+                <div class="form-hint" style="margin-bottom:6px">Eller klistra in en bild-URL direkt:</div>
+                <div class="upload-url-row">
+                  <input type="url" id="fImgUrl" placeholder="https://images.unsplash.com/...">
+                  <button class="upload-url-btn" onclick="loadImgFromUrl()">Hämta</button>
+                </div>
+              </div>
+              <input type="hidden" id="fImg">
+            </div>
+          </div>
+
+          <!-- Inställningar -->
+          <div class="form-card" style="margin-bottom:20px">
+            <div class="form-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              Inställningar
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Gratis</div>
+                <div class="toggle-sub">Visas med grönt "Gratis"-märke i appen</div>
+              </div>
+              <label class="toggle-sw"><input type="checkbox" id="fFree"><span class="toggle-track"></span></label>
+            </div>
+          </div>
+
+          <div class="form-footer">
+            <button class="btn-ghost" onclick="showPage('list')">Avbryt</button>
+            <button class="btn-primary" onclick="saveItem()">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M13 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V5l-3-3z"/><path d="M10 2v3H5M8 12V8"/></svg>
+              Spara inlägg
+            </button>
+          </div>
+        </div>
+
+        <!-- RIGHT: PREVIEW -->
+        <div class="preview-wrap">
+          <div class="preview-label">Förhandsvisning i appen</div>
+          <div class="preview-phone">
+            <img id="pvImg" class="preview-img" src="" alt="">
+            <div class="preview-body">
+              <div id="pvCat" class="preview-cat" style="background:rgba(0,0,0,.08);color:rgba(0,0,0,.5)">Kategori</div>
+              <div id="pvName" class="preview-name" style="color:rgba(0,0,0,.3)">Namn på inlägg</div>
+              <div id="pvDesc" class="preview-desc">Kort beskrivning visas här</div>
+              <div class="preview-stats">
+                <div class="preview-stat" id="pvDate">Datum</div>
+                <div class="preview-stat" id="pvLoc">Plats</div>
+                <div class="preview-stat" id="pvTime">Tid</div>
+              </div>
+              <div class="preview-btns">
+                <div class="preview-btn-g">Hitta hit</div>
+                <div class="preview-btn-b">Ansök att gå med</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- #main -->
+</div><!-- #app -->
+
+<div id="toast"></div>
+<div id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-title">Ta bort inlägg?</div>
+    <div class="confirm-sub" id="confirmSub">Åtgärden kan inte ångras.</div>
+    <div class="confirm-btns">
+      <button class="btn-ghost" style="flex:1" onclick="closeConfirm()">Avbryt</button>
+      <button class="btn-danger" style="flex:1;justify-content:center" id="confirmOk">Ta bort</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA (seeded from main app) ────────────────────────────────────
+const SEED=[
+  {id:1,cat:'event',name:'Flemingsberg Tour',desc:'En guideresa genom hela centrum',longDesc:'Upplev Flemingsberg på ett nytt sätt med denna guidade stadsrunda.',date:'12 Jun',time:'12:00–14:00',loc:'Flemingsbergs C',addr:'Sankt Åkes väg 24',area:'flemingsberg',host:'ABF',free:false,url:'https://www.abf.se',img:'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80',lat:59.2178,lng:17.9465},
+  {id:2,cat:'event',name:'Kulturkvällen',desc:'Konst, mat och musik i parken',longDesc:'En kväll fylld av konst, lokal mat och livemusik under bar himmel.',date:'14 Jun',time:'17:00–21:00',loc:'Huddinge Centrum',addr:'Kommunalvägen 28',area:'huddinge',host:'Huddinge Kommun',free:true,url:'https://www.huddinge.se',img:'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80',lat:59.2358,lng:17.9832},
+  {id:3,cat:'event',name:'Naturvandring',desc:'Guidad tur i Lida naturreservat',longDesc:'Vandring i ett av södra Stockholms vackraste naturreservat.',date:'15 Jun',time:'09:00–13:00',loc:'Lida',addr:'Lida Naturreservat',area:'lida',host:'Naturskyddsföreningen',free:true,url:'https://www.naturskyddsforeningen.se',img:'https://images.unsplash.com/photo-1476820865390-c52aeebb9891?w=600&q=80',lat:59.1905,lng:17.8730},
+  {id:4,cat:'event',name:'Familjedag',desc:'Aktiviteter för hela familjen',longDesc:'En härlig familjedag med lekar, hantverk och aktiviteter för alla åldrar.',date:'21 Jun',time:'11:00–16:00',loc:'Sjödalen',addr:'Sjödalens Gård 1',area:'sjodalen',host:'Huddinge Kommun',free:true,url:'https://www.huddinge.se',img:'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&q=80',lat:59.2680,lng:18.0120},
+  {id:5,cat:'konst',name:'KTH Utställning',desc:'Studentkonst och design',longDesc:'Studenternas bästa arbeten visas upp i KTHs öppna galleriyta.',date:'10–30 Jun',time:'10:00–18:00',loc:'KTH Flemingsberg',addr:'Hälsovägen 11',area:'flemingsberg',host:'KTH',free:false,url:'https://www.kth.se',img:'https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=600&q=80',lat:59.2205,lng:17.9388},
+  {id:6,cat:'konst',name:'Glömsta Galleri',desc:'Lokal konst och hantverk',longDesc:'En intim gallerupplevelse med lokala konstnärer.',date:'Löpande',time:'11:00–17:00',loc:'Glömsta',addr:'Glömstavägen 5',area:'glomsta',host:'Huddinge Kommun',free:false,url:'https://www.huddinge.se/kultur',img:'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=600&q=80',lat:59.2562,lng:17.9124},
+  {id:7,cat:'konst',name:'Outdoor Murals',desc:'Gatukonst i Skogås',longDesc:'En promenadtur bland stora väggmålningar.',date:'Permanent',time:'Dygnet runt',loc:'Skogås',addr:'Skogåsvägen 12',area:'skogas',host:'Huddinge Kommun',free:true,url:'https://www.huddinge.se/kultur',img:'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&q=80',lat:59.1998,lng:18.0352},
+  {id:8,cat:'motes',name:'ABF Huddinge',desc:'Mötesplats för alla åldrar',longDesc:'ABF erbjuder kurser, föreläsningar och mötesplatser för alla åldrar.',date:'Mån–Fre',time:'09:00–17:00',loc:'Huddinge Centrum',addr:'Kommunalvägen 32',area:'huddinge',host:'ABF',free:false,url:'https://www.abf.se',img:'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80',lat:59.2389,lng:17.9801},
+  {id:9,cat:'motes',name:'Flemingsberg Bibliotek',desc:'Böcker, internet och studiero',longDesc:'Flemingsbergs bibliotek erbjuder böcker, tidningar och internet.',date:'Löpande',time:'10:00–19:00',loc:'Flemingsbergs C',addr:'Biblioteksvägen 1',area:'flemingsberg',host:'Stadsbiblioteket',free:true,url:'https://bibliotek.huddinge.se',img:'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=600&q=80',lat:59.2192,lng:17.9450},
+  {id:10,cat:'motes',name:'Sjödalen Gård',desc:'Historisk gård och mötesplats',longDesc:'Historisk gård från 1700-talet, nu mötesplats för hembygdsföreningen.',date:'Löpande',time:'10:00–16:00',loc:'Sjödalen',addr:'Sjödalsvägen 3',area:'sjodalen',host:'Huddinge Kommun',free:true,url:'https://www.huddinge.se/kultur',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80',lat:59.2680,lng:18.0050},
+  {id:11,cat:'musik',name:'Jazz i parken',desc:'Sommarjazz under öppen himmel',longDesc:'Årets stora utomhuskonsert med lokala jazzmusiker.',date:'20 Jun',time:'18:00–21:00',loc:'Stortorget',addr:'Stortorget 1',area:'huddinge',host:'Huddinge Kommun',free:true,url:'https://www.huddinge.se/kultur',img:'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=600&q=80',lat:59.2410,lng:17.9870},
+  {id:12,cat:'musik',name:'Sommarkonsert',desc:'Klassisk musik i Vistabergs kyrka',longDesc:'En klassisk konsert med stycken av Mozart, Haydn och Beethoven.',date:'28 Jun',time:'19:00–21:30',loc:'Vistabergs Kyrka',addr:'Kyrkovägen 5',area:'vistaberg',host:'Huddinge Musikskola',free:false,url:'https://www.huddinge.se/kultur',img:'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=600&q=80',lat:59.1845,lng:17.9650},
+  {id:13,cat:'musik',name:'Trubadur på Torget',desc:'Folkmusik och visor',longDesc:'Elever och lärare framför folkmusik och svenska visor på torget.',date:'22 Jun',time:'14:00–16:00',loc:'Huddinge Torg',addr:'Huddinge Torg 2',area:'huddinge',host:'Huddinge Musikskola',free:true,url:'https://www.huddinge.se/kultur',img:'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&q=80',lat:59.2367,lng:17.9811},
+];
+
+const CAT_COLOR={event:'#bf5917',konst:'#068a99',motes:'#c0136f',musik:'#c3a523'};
+const CAT_BG={event:'rgba(209,96,23,.12)',konst:'rgba(71,193,206,.12)',motes:'rgba(209,66,142,.12)',musik:'rgba(248,216,75,.2)'};
+const CAT_LABEL={event:'Event',konst:'Konst',motes:'Mötesplats',musik:'Musik'};
+const AREA_LABEL={flemingsberg:'Flemingsberg',huddinge:'Huddinge',skogas:'Skogås',sjodalen:'Sjödalen',glomsta:'Glömsta',vistaberg:'Vistaberg',lida:'Lida'};
+
+let items=[], editingId=null, navFilter=null;
+
+function loadItems(){
+  const saved=localStorage.getItem('hk_admin_items');
+  items=saved?JSON.parse(saved):JSON.parse(JSON.stringify(SEED));
+}
+function saveItems(){ localStorage.setItem('hk_admin_items',JSON.stringify(items)); }
+
+// ── AUTH ─────────────────────────────────────────────────────────
+function doLogin(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  if(u==='admin'&&p==='0000'){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    loadItems(); renderAll();
+  } else {
+    const err=document.getElementById('loginErr');
+    err.style.display='block';
+    setTimeout(()=>err.style.display='none',3000);
+    document.getElementById('loginPass').value='';
+    document.getElementById('loginPass').focus();
+  }
+}
+function doLogout(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────────
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page'+p).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  if(p==='list') document.getElementById('navList').classList.add('active');
+  else if(p==='form') document.getElementById('navAdd').classList.add('active');
+  if(p==='list') renderAll();
+}
+function filterNav(cat){
+  navFilter=cat;
+  renderList();
+  showPage('list');
+}
+
+// ── RENDER LIST ──────────────────────────────────────────────────
+function renderAll(){
+  renderStats(); renderList();
+}
+function renderStats(){
+  const g=document.getElementById('statsGrid');
+  const total=items.length;
+  const byCat=cat=>items.filter(i=>i.cat===cat).length;
+  g.innerHTML=`
+    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Totalt inlägg</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--event)">${byCat('event')}</div><div class="stat-label"><span class="stat-dot" style="background:var(--event)"></span>Events</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--konst)">${byCat('konst')}</div><div class="stat-label"><span class="stat-dot" style="background:var(--konst)"></span>Konst</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--motes)">${byCat('motes')}</div><div class="stat-label"><span class="stat-dot" style="background:var(--motes)"></span>Mötesplats</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--musik)">${byCat('musik')}</div><div class="stat-label"><span class="stat-dot" style="background:var(--musik)"></span>Musik</div></div>`;
+  document.getElementById('navCount').textContent=total;
+}
+function renderList(search=''){
+  let vis=navFilter?items.filter(i=>i.cat===navFilter):items;
+  if(search) vis=vis.filter(i=>i.name.toLowerCase().includes(search.toLowerCase())||i.loc.toLowerCase().includes(search.toLowerCase()));
+  const count=vis.length;
+  document.getElementById('listSub').textContent=navFilter?`${count} ${CAT_LABEL[navFilter]}-inlägg`:`${count} inlägg totalt`;
+  const g=document.getElementById('itemsGrid');
+  if(!vis.length){g.innerHTML=`<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Inga inlägg hittades</div></div>`;return;}
+  g.innerHTML=vis.map(item=>`
+    <div class="item-card">
+      <img class="item-thumb" src="${item.img}" alt="${item.name}" onerror="this.src='https://images.unsplash.com/photo-1486325212027-8081e485255e?w=200'">
+      <div class="item-info">
+        <div class="item-name">${item.name}</div>
+        <div class="item-meta">
+          <span class="cat-badge" style="background:${CAT_BG[item.cat]};color:${CAT_COLOR[item.cat]}">${CAT_LABEL[item.cat]}</span>
+          ${item.free?'<span class="free-badge">Gratis</span>':''}
+          <span class="area-badge">${AREA_LABEL[item.area]||item.area||'—'}</span>
+          <span class="area-badge">${item.date||'—'}</span>
+        </div>
+        <div class="item-desc">${item.desc}</div>
+      </div>
+      <div class="item-actions">
+        <button class="edit-btn" onclick="editItem(${item.id})">Redigera</button>
+        <button class="btn-danger" onclick="confirmDelete(${item.id})">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 3h12M5 3V1h4v2M11 3l-1 9H4L3 3"/></svg>
+        </button>
+      </div>
+    </div>`).join('');
+}
+
+// ── FORM ─────────────────────────────────────────────────────────
+function newItem(){
+  editingId=null;
+  document.getElementById('formTitle').textContent='Nytt inlägg';
+  clearForm();
+  showPage('form');
+}
+function editItem(id){
+  editingId=id;
+  clearForm();
+  const item=items.find(x=>x.id===id);
+  document.getElementById('formTitle').textContent='Redigera: '+item.name;
+  document.getElementById('fName').value=item.name||'';
+  document.getElementById('fDesc').value=item.desc||'';
+  document.getElementById('fLongDesc').value=item.longDesc||'';
+  // Date: try to parse, else mark as recurring
+  const recurring=['Löpande','Permanent','löpande','permanent'].some(s=>item.date?.includes(s));
+  if(recurring){
+    document.getElementById('fRecurring').checked=true;
+    document.getElementById('fDate').disabled=true;
+  } else if(item.date){
+    // Try to parse "12 Jun" style → convert to YYYY-MM-DD for date input
+    try{
+      const months={Jan:0,Feb:1,Mar:2,Apr:3,Maj:4,Jun:5,Jul:6,Aug:7,Sep:8,Okt:9,Nov:10,Dec:11};
+      const parts=item.date.split(/[\s–]/);
+      if(parts.length>=2&&months[parts[1]]!==undefined){
+        const y=new Date().getFullYear();
+        const d=new Date(y,months[parts[1]],parseInt(parts[0]));
+        document.getElementById('fDate').value=d.toISOString().slice(0,10);
+      }
+    }catch(e){}
+  }
+  // Time: parse "12:00–14:00" style
+  if(item.time){
+    const tp=item.time.split('–');
+    document.getElementById('fTimeStart').value=tp[0]?.trim()||'';
+    document.getElementById('fTimeEnd').value=tp[1]?.trim()||'';
+  }
+  // Address
+  document.getElementById('fLoc').value=item.loc||'';
+  document.getElementById('fAddr').value=item.addr||'';
+  document.getElementById('fLat').value=item.lat||'';
+  document.getElementById('fLng').value=item.lng||'';
+  if(item.loc){
+    addrSelected=true;
+    document.getElementById('addrSelectedText').textContent=item.loc;
+    document.getElementById('addrSelected').style.display='flex';
+    document.getElementById('addrCoords').textContent=item.lat&&item.lng?`📍 ${item.lat}, ${item.lng}`:'';
+  }
+  document.getElementById('fArea').value=item.area||'';
+  document.getElementById('fHost').value=item.host||'';
+  document.getElementById('fUrl').value=item.url||'';
+  document.getElementById('fFree').checked=item.free||false;
+  document.getElementById('fCat').value=item.cat||'';
+  selectCatForm(item.cat,false);
+  // Image
+  if(item.img) setImage(item.img);
+  updatePreview();
+  showPage('form');
+}
+function clearForm(){
+  ['fName','fDesc','fLongDesc','fUrl','fImg','fLat','fLng','fLoc','fAddr'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('fDate').value='';
+  document.getElementById('fDate').disabled=false;
+  document.getElementById('fTimeStart').value='';
+  document.getElementById('fTimeEnd').value='';
+  document.getElementById('fRecurring').checked=false;
+  document.getElementById('fArea').value='';
+  document.getElementById('fHost').value='';
+  document.getElementById('fCat').value='';
+  document.getElementById('fFree').checked=false;
+  document.querySelectorAll('.cat-pill').forEach(p=>{p.className='cat-pill';});
+  clearAddr(); clearImage();
+  document.getElementById('fImgUrl').value='';
+  updatePreview();
+}
+function selectCatForm(cat, update=true){
+  document.getElementById('fCat').value=cat;
+  document.querySelectorAll('.cat-pill').forEach(p=>{
+    p.className='cat-pill'+(p.dataset.cat===cat?' on-'+cat:'');
+  });
+  if(update) updatePreview();
+}
+function saveItem(){
+  const name=document.getElementById('fName').value.trim();
+  const cat=document.getElementById('fCat').value;
+  if(!name){toast('⚠️ Fyll i ett namn');return;}
+  if(!cat){toast('⚠️ Välj en kategori');return;}
+  const item={
+    id: editingId || (Math.max(0,...items.map(i=>i.id))+1),
+    cat, name,
+    desc: document.getElementById('fDesc').value.trim(),
+    longDesc: document.getElementById('fLongDesc').value.trim(),
+    date: getDateDisplay(),
+    time: getTimeDisplay(),
+    loc: document.getElementById('fLoc').value.trim(),
+    addr: document.getElementById('fAddr').value.trim(),
+    area: document.getElementById('fArea').value,
+    host: document.getElementById('fHost').value,
+    free: document.getElementById('fFree').checked,
+    url: document.getElementById('fUrl').value.trim(),
+    img: document.getElementById('fImg').value.trim(),
+    lat: parseFloat(document.getElementById('fLat').value)||59.218,
+    lng: parseFloat(document.getElementById('fLng').value)||17.978,
+  };
+  if(editingId){ const idx=items.findIndex(x=>x.id===editingId); items[idx]=item; }
+  else items.push(item);
+  saveItems(); renderAll(); showPage('list');
+  toast(editingId?'✓ Inlägg uppdaterat':'✓ Inlägg sparat');
+}
+
+// ── DELETE ────────────────────────────────────────────────────────
+let deleteId=null;
+function confirmDelete(id){
+  deleteId=id;
+  const item=items.find(x=>x.id===id);
+  document.getElementById('confirmSub').textContent=`"${item.name}" tas bort permanent.`;
+  document.getElementById('confirmOverlay').classList.add('show');
+  document.getElementById('confirmOk').onclick=()=>{
+    items=items.filter(x=>x.id!==deleteId);
+    saveItems(); renderAll(); closeConfirm();
+    toast('🗑 Inlägg borttaget');
+  };
+}
+function closeConfirm(){ document.getElementById('confirmOverlay').classList.remove('show'); }
+
+// ── DATE / TIME ──────────────────────────────────────────────────
+function toggleRecurring(){
+  const r=document.getElementById('fRecurring').checked;
+  document.getElementById('fDate').disabled=r;
+  document.getElementById('timeField').style.opacity=r?.4:1;
+  updatePreview();
+}
+function getDateDisplay(){
+  const r=document.getElementById('fRecurring').checked;
+  if(r) return 'Löpande';
+  const v=document.getElementById('fDate').value;
+  if(!v) return '';
+  const d=new Date(v+'T00:00:00');
+  return d.toLocaleDateString('sv-SE',{day:'numeric',month:'short'});
+}
+function getTimeDisplay(){
+  const s=document.getElementById('fTimeStart').value;
+  const e=document.getElementById('fTimeEnd').value;
+  if(!s) return '';
+  return e?`${s}–${e}`:s;
+}
+
+// ── ADDRESS SEARCH (Nominatim) ────────────────────────────────────
+let addrDebounce=null, addrSelected=false;
+function onAddrInput(){
+  if(addrSelected) return;
+  clearTimeout(addrDebounce);
+  const q=document.getElementById('fAddrSearch').value.trim();
+  if(q.length<3){ hideAddrDropdown(); return; }
+  addrDebounce=setTimeout(()=>searchAddr(q),400);
+}
+async function searchAddr(q){
+  document.getElementById('addrSpinner').style.display='block';
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q+', Huddinge')}&format=json&limit=6&viewbox=17.73,59.08,18.24,59.34&bounded=0&accept-language=sv&countrycodes=se`,{headers:{'Accept-Language':'sv'}});
+    const data=await r.json();
+    showAddrResults(data);
+  }catch(e){ hideAddrDropdown(); }
+  document.getElementById('addrSpinner').style.display='none';
+}
+function showAddrResults(results){
+  const dd=document.getElementById('addrDropdown');
+  if(!results.length){dd.innerHTML='<div class="addr-result"><div class="addr-result-name" style="color:rgba(0,0,0,.4)">Inga resultat</div></div>';dd.style.display='block';return;}
+  dd.innerHTML=results.map((r,i)=>{
+    const parts=r.display_name.split(', ');
+    const name=parts[0]+(parts[1]&&parts[1]!==parts[0]?', '+parts[1]:'');
+    const sub=parts.slice(2,5).join(', ');
+    return `<div class="addr-result" onclick="selectAddr(${i},'${escJ(r.display_name)}',${r.lat},${r.lon})">
+      <div class="addr-result-name">${name}</div>
+      <div class="addr-result-sub">${sub}</div>
+    </div>`;
+  }).join('');
+  dd._data=results;
+  dd.style.display='block';
+}
+function escJ(s){return s.replace(/'/g,"\\'").replace(/\n/g,'')}
+function selectAddr(i,full,lat,lon){
+  const dd=document.getElementById('addrDropdown');
+  const r=dd._data?dd._data[i]:null;
+  hideAddrDropdown();
+  addrSelected=true;
+  const parts=full.split(', ');
+  const displayName=parts[0]+(parts[1]&&parts[1]!==parts[0]?', '+parts[1]:'');
+  document.getElementById('fAddrSearch').value='';
+  document.getElementById('fLoc').value=displayName;
+  document.getElementById('fAddr').value=parts.slice(0,3).join(', ');
+  document.getElementById('fLat').value=parseFloat(lat).toFixed(5);
+  document.getElementById('fLng').value=parseFloat(lon).toFixed(5);
+  document.getElementById('addrSelectedText').textContent=displayName;
+  document.getElementById('addrSelected').style.display='flex';
+  document.getElementById('addrCoords').textContent=`📍 ${parseFloat(lat).toFixed(4)}, ${parseFloat(lon).toFixed(4)}`;
+  // Auto-suggest area
+  const lc=full.toLowerCase();
+  const areaMap={flemingsberg:'flemingsberg',huddinge:'huddinge',skogås:'skogas','skogas':'skogas',sjödalen:'sjodalen',sjodalen:'sjodalen',glömsta:'glomsta',glomsta:'glomsta',vistaberg:'vistaberg',lida:'lida'};
+  for(const [k,v] of Object.entries(areaMap)){ if(lc.includes(k)){ document.getElementById('fArea').value=v; break; } }
+  updatePreview();
+}
+function clearAddr(){
+  addrSelected=false;
+  document.getElementById('addrSelected').style.display='none';
+  document.getElementById('addrCoords').textContent='';
+  document.getElementById('fLoc').value='';
+  document.getElementById('fAddr').value='';
+  document.getElementById('fLat').value='';
+  document.getElementById('fLng').value='';
+  document.getElementById('fAddrSearch').value='';
+  updatePreview();
+}
+function hideAddrDropdown(){ document.getElementById('addrDropdown').style.display='none'; }
+document.addEventListener('click',e=>{
+  if(!document.getElementById('addrDropdown').contains(e.target)&&e.target.id!=='fAddrSearch') hideAddrDropdown();
+});
+
+// ── IMAGE UPLOAD ─────────────────────────────────────────────────
+function handleFileSelect(e){
+  const file=e.target.files[0]; if(!file||!file.type.startsWith('image/')) return;
+  const reader=new FileReader();
+  reader.onload=ev=>setImage(ev.target.result);
+  reader.readAsDataURL(file);
+}
+function loadImgFromUrl(){
+  const url=document.getElementById('fImgUrl').value.trim();
+  if(!url) return;
+  setImage(url);
+  document.getElementById('fImgUrl').value='';
+}
+function setImage(src){
+  document.getElementById('fImg').value=src;
+  document.getElementById('imgPreviewEl').src=src;
+  document.getElementById('imgPreviewArea').style.display='block';
+  document.getElementById('uploadZone').style.display='none';
+  document.getElementById('pvImg').src=src;
+}
+function clearImage(){
+  document.getElementById('fImg').value='';
+  document.getElementById('imgPreviewArea').style.display='none';
+  document.getElementById('uploadZone').style.display='block';
+  document.getElementById('pvImg').src='';
+  document.getElementById('fileInput').value='';
+}
+// Drag & drop
+document.addEventListener('DOMContentLoaded',()=>{
+  const zone=document.getElementById('uploadZone');
+  if(!zone) return;
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over')});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
+  zone.addEventListener('drop',e=>{
+    e.preventDefault(); zone.classList.remove('drag-over');
+    const file=e.dataTransfer.files[0];
+    if(file&&file.type.startsWith('image/')){
+      const r=new FileReader(); r.onload=ev=>setImage(ev.target.result); r.readAsDataURL(file);
+    }
+  });
+});
+function updatePreview(){
+  const cat=document.getElementById('fCat').value;
+  const name=document.getElementById('fName').value||'Namn på inlägg';
+  const desc=document.getElementById('fDesc').value||'Kort beskrivning visas här';
+  const date=getDateDisplay()||'Datum';
+  const loc=document.getElementById('fLoc').value||'Plats';
+  const time=getTimeDisplay()||'Tid';
+  const pv=document.getElementById('pvCat');
+  if(cat){ pv.style.background=CAT_BG[cat]; pv.style.color=CAT_COLOR[cat]; pv.textContent=CAT_LABEL[cat]; }
+  else { pv.style.background='rgba(0,0,0,.08)'; pv.style.color='rgba(0,0,0,.4)'; pv.textContent='Kategori'; }
+  document.getElementById('pvName').textContent=name;
+  document.getElementById('pvName').style.color=name==='Namn på inlägg'?'rgba(0,0,0,.3)':'#000';
+  document.getElementById('pvDesc').textContent=desc;
+  document.getElementById('pvDate').textContent=date;
+  document.getElementById('pvLoc').textContent=loc;
+  document.getElementById('pvTime').textContent=time;
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
+
+// ── LIVE PREVIEW on input ─────────────────────────────────────────
+['fName','fDesc'].forEach(id=>{
+  document.getElementById(id)?.addEventListener('input',updatePreview);
+});
+</script>
+</body>
+</html>
