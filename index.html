@@ -113,11 +113,13 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
 
 #cardScroll{
   display:flex;gap:12px;overflow-x:auto;
-  padding:0 16px calc(env(safe-area-inset-bottom,0px) + 16px) 16px;
+  padding:0 0 calc(env(safe-area-inset-bottom,0px) + 16px) 0;
   scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;
   align-items:stretch;
 }
 #cardScroll::-webkit-scrollbar{display:none}
+/* Spacers för korrekt padding i scroll-containers */
+#cardScroll::before,#cardScroll::after{content:'';flex-shrink:0;width:16px}
 #cardScroll.single-card{overflow-x:hidden}
 #cardScroll.single-card .ev-card{width:calc(100vw - 32px)}
 
@@ -727,6 +729,7 @@ function dismissCards(){
   activeIds=[];
   prevIds.forEach(refreshClusterByItemId);
   document.getElementById('cardPanel').classList.remove('visible');
+  document.getElementById('cardScroll').classList.remove('single-card');
   document.getElementById('tabBar').classList.remove('hidden');
   document.getElementById('backBtn').classList.remove('visible');
   document.getElementById('topBar').style.opacity='';
