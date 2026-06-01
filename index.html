@@ -611,8 +611,21 @@ const AREAS_LIST=[
 
 // ── STATE ──────────────────────────────────────────────────────────────
 let ITEMS=[], ORGS_LIST=[];
-let map, leafMarkers={}, activeIds=[], selectedCat=null, activeTab='event', detailMapInstance=null;
+let map, leafMarkers={}, clusters=[], activeIds=[], selectedCat=null, activeTab='event', detailMapInstance=null;
 const filterState={free:false,orgs:new Set(),areas:new Set()};
+
+// ── CLUSTER HELPERS ────────────────────────────────────────────────────
+function clusterKey(lat,lng){ return `${lat.toFixed(4)}_${lng.toFixed(4)}`; }
+
+function buildClusters(items){
+  const result=[];
+  items.forEach(item=>{
+    const c=result.find(c=>Math.abs(c.lat-item.lat)<0.0002&&Math.abs(c.lng-item.lng)<0.0002);
+    if(c) c.items.push(item);
+    else result.push({lat:item.lat,lng:item.lng,items:[item],key:clusterKey(item.lat,item.lng)});
+  });
+  return result;
+}
 
 // ── MAP ────────────────────────────────────────────────────────────────
 const BOUNDS=L.latLngBounds([59.08,17.73],[59.34,18.24]);
@@ -626,7 +639,7 @@ function initMap(){
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
   const ui=L.divIcon({html:`<div class="user-dot"><div class="user-dot-inner"></div></div>`,className:'',iconSize:[26,26],iconAnchor:[13,13]});
   L.marker([59.2195,17.9490],{icon:ui,interactive:false}).addTo(map);
-  ITEMS.forEach(addMarker);
+  rebuildClusterMarkers();
   map.on('click',()=>{ if(activeIds.length) dismissCards(); });
   window.addEventListener('resize',()=>map.invalidateSize());
 }
@@ -639,38 +652,53 @@ function mHtml(cat,big){
   </div>`;
 }
 
-function addMarker(item){
-  const big=activeIds.includes(item.id), sz=big?87.6:62.7;
-  const icon=L.divIcon({html:mHtml(item.cat,big),className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz]});
-  const m=L.marker([item.lat,item.lng],{icon}).addTo(map);
-  m.on('click',e=>{ L.DomEvent.stopPropagation(e); handleMarkerClick(item); });
-  leafMarkers[item.id]=m;
+function mClusterHtml(cluster,big){
+  const sz=big?'mpin-lg':'mpin-sm', wt=big?87.6:62.7;
+  const fs=big?'20px':'15px';
+  // En färg om alla samma kategori, annars mörk neutral
+  const cats=[...new Set(cluster.items.map(i=>i.cat))];
+  const color=cats.length===1?CAT_COLOR[cats[0]]:'#1c1c1e';
+  return `<div class="mpin ${sz}" style="width:${wt}px;height:${wt}px">
+    <div class="mpin-tail"></div>
+    <div class="mpin-circle" style="background:${color};display:flex;align-items:center;justify-content:center">
+      <span style="color:#fff;font-family:'Inter',sans-serif;font-size:${fs};font-weight:700;line-height:1;letter-spacing:-.5px">${cluster.items.length}</span>
+    </div>
+  </div>`;
 }
 
-function refreshMarker(id){
-  const m=leafMarkers[id]; if(!m)return;
-  const item=ITEMS.find(x=>x.id===id); if(!item)return;
-  const big=activeIds.includes(id), sz=big?87.6:62.7;
-  m.setIcon(L.divIcon({html:mHtml(item.cat,big),className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz]}));
+function addClusterMarker(cluster){
+  const isActive=cluster.items.some(i=>activeIds.includes(i.id));
+  const big=isActive;
+  const html=cluster.items.length>1?mClusterHtml(cluster,big):mHtml(cluster.items[0].cat,big);
+  const sz=big?87.6:62.7;
+  const icon=L.divIcon({html,className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz]});
+  const m=L.marker([cluster.lat,cluster.lng],{icon}).addTo(map);
+  m.on('click',e=>{ L.DomEvent.stopPropagation(e); showCards(cluster.items.map(i=>i.id)); });
+  leafMarkers[cluster.key]=m;
 }
 
-// ── MARKER CLICK ───────────────────────────────────────────────────────
-function handleMarkerClick(clickedItem){
-  // Find all visible items at approximately the same location (within ~50m)
-  const vis=getVisible();
-  const nearby=vis.filter(i=>
-    Math.abs(i.lat-clickedItem.lat)<0.001 &&
-    Math.abs(i.lng-clickedItem.lng)<0.001
-  );
-  const ids=nearby.length?nearby.map(i=>i.id):[clickedItem.id];
-  showCards(ids);
+function refreshClusterByItemId(id){
+  const cluster=clusters.find(c=>c.items.some(i=>i.id===id)); if(!cluster)return;
+  const m=leafMarkers[cluster.key]; if(!m)return;
+  const isActive=cluster.items.some(i=>activeIds.includes(i.id));
+  const big=isActive;
+  const html=cluster.items.length>1?mClusterHtml(cluster,big):mHtml(cluster.items[0].cat,big);
+  const sz=big?87.6:62.7;
+  m.setIcon(L.divIcon({html,className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz]}));
+}
+
+function rebuildClusterMarkers(){
+  Object.values(leafMarkers).forEach(m=>{ try{map.removeLayer(m);}catch(e){} });
+  leafMarkers={};
+  clusters=buildClusters(getVisible());
+  clusters.forEach(addClusterMarker);
 }
 
 function showCards(ids){
   const prevIds=[...activeIds];
   activeIds=ids;
-  prevIds.forEach(id=>{ if(!activeIds.includes(id)) refreshMarker(id); });
-  activeIds.forEach(refreshMarker);
+  prevIds.forEach(id=>{ if(!activeIds.includes(id)) refreshClusterByItemId(id); });
+  activeIds.forEach(refreshClusterByItemId);
 
   // Render cards
   const scroll=document.getElementById('cardScroll');
@@ -697,7 +725,7 @@ function showCards(ids){
 function dismissCards(){
   const prevIds=[...activeIds];
   activeIds=[];
-  prevIds.forEach(refreshMarker);
+  prevIds.forEach(refreshClusterByItemId);
   document.getElementById('cardPanel').classList.remove('visible');
   document.getElementById('tabBar').classList.remove('hidden');
   document.getElementById('backBtn').classList.remove('visible');
@@ -765,12 +793,7 @@ function getVisible(){
 
 function applyFilters(){
   filterState.free=document.getElementById('freeToggle').checked;
-  const vis=getVisible();
-  ITEMS.forEach(item=>{
-    const m=leafMarkers[item.id]; if(!m)return;
-    const show=vis.some(v=>v.id===item.id);
-    show?(!map.hasLayer(m)&&map.addLayer(m)):(map.hasLayer(m)&&map.removeLayer(m));
-  });
+  rebuildClusterMarkers();
   updateFilterBtnState();
 }
 
