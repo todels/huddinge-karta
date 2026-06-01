@@ -113,9 +113,9 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
 
 #cardScroll{
   display:flex;gap:12px;overflow-x:auto;
-  padding:0 16px calc(env(safe-area-inset-bottom,0px) + 100px) 16px;
+  padding:0 16px calc(env(safe-area-inset-bottom,0px) + 16px) 16px;
   scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;
-  align-items:stretch; /* alla kort samma höjd */
+  align-items:stretch;
 }
 #cardScroll::-webkit-scrollbar{display:none}
 #cardScroll.single-card{overflow-x:hidden}
