@@ -591,6 +591,7 @@ const PIN_SVG={
   kurs:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
   motes:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>`,
   galleri:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`,
+  fastkonst:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`,
   bibliotek:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V2H6.5A2.5 2.5 0 0 0 4 4.5v15z"/></svg>`,
   teaterlokal:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M2 7c3-.5 5.5-.5 10 0 4.5-.5 7-.5 10 0v10c-3-.5-5.5-.5-10 0-4.5-.5-7-.5-10 0V7z"/><path d="M12 7v10"/></svg>`,
   museum:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M3 22V9M21 22V9M12 2L2 9h20L12 2zM5 22v-6h4v6M15 22v-6h4v6M9 22v-4h6v4"/></svg>`,
@@ -611,6 +612,7 @@ const CHIP_SVGS={
   kurs:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
   motes:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>`,
   galleri:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`,
+  fastkonst:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`,
   bibliotek:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V2H6.5A2.5 2.5 0 0 0 4 4.5v15z"/></svg>`,
   teaterlokal:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 7c3-.5 5.5-.5 10 0 4.5-.5 7-.5 10 0v10c-3-.5-5.5-.5-10 0-4.5-.5-7-.5-10 0V7z"/><path d="M12 7v10"/></svg>`,
   museum:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 22V9M21 22V9M12 2L2 9h20L12 2zM5 22v-6h4v6M15 22v-6h4v6M9 22v-4h6v4"/></svg>`,
@@ -618,7 +620,7 @@ const CHIP_SVGS={
 
 // Kategorier: events (tidsbaserade) + platser (permanenta)
 const EVENT_CATS=['musik','konst','teater','samhalle','fritid','spel','hantverk','film','kurs'];
-const PLATS_CATS=['motes','galleri','bibliotek','teaterlokal','museum'];
+const PLATS_CATS=['fastkonst','motes'];
 
 const CAT_COLOR={
   // Events
@@ -626,22 +628,19 @@ const CAT_COLOR={
   samhalle:'#1D4ED8', fritid:'#EA580C', spel:'#C94091',
   hantverk:'#92400E', film:'#374151', kurs:'#0284C7',
   // Platser
-  motes:'#BE5A00', galleri:'#008296', bibliotek:'#1D4ED8',
-  teaterlokal:'#7C3AED', museum:'#6D28D9',
+  fastkonst:'#008296', motes:'#F97316',
 };
 const CAT_BG={
   musik:'rgba(61,135,0,.14)', konst:'rgba(0,130,150,.14)', teater:'rgba(124,58,237,.14)',
   samhalle:'rgba(29,78,216,.14)', fritid:'rgba(234,88,12,.14)', spel:'rgba(201,64,145,.14)',
   hantverk:'rgba(146,64,14,.14)', film:'rgba(55,65,81,.14)', kurs:'rgba(2,132,199,.14)',
-  motes:'rgba(190,90,0,.14)', galleri:'rgba(0,130,150,.14)', bibliotek:'rgba(29,78,216,.14)',
-  teaterlokal:'rgba(124,58,237,.14)', museum:'rgba(109,40,217,.14)',
+  fastkonst:'rgba(0,130,150,.14)', motes:'rgba(249,115,22,.14)',
 };
 const CAT_LABEL={
   musik:'Musik', konst:'Konst', teater:'Teater',
   samhalle:'Samhälle', fritid:'Fritid', spel:'Spel',
   hantverk:'Hantverk', film:'Film', kurs:'Kurs',
-  motes:'Mötesplats', galleri:'Galleri', bibliotek:'Bibliotek',
-  teaterlokal:'Teaterlokal', museum:'Museum',
+  fastkonst:'Fast konst', motes:'Mötesplats',
 };
 const AREAS_LIST=[
   {id:'flemingsberg',name:'Flemingsberg'},{id:'huddinge',name:'Huddinge'},
@@ -788,7 +787,7 @@ function evCardHtml(item){
         </div>
       </div>
       <div class="ev-card-tags">
-        <span class="ev-tag">${S.clock}${item.date} · ${item.time.split('–')[0].split('-')[0]}</span>
+        ${item.type!=='plats'?`<span class="ev-tag">${S.clock}${item.date} · ${item.time.split('–')[0].split('-')[0]}</span>`:''}
         <span class="ev-tag">${S.pin}${item.loc}</span>
         <span class="ev-tag" style="background:${CAT_BG[item.cat]};color:${col}">${lbl}</span>
         ${item.free?'<span class="free-badge">Gratis</span>':''}
