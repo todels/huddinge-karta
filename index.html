@@ -44,15 +44,6 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
   box-shadow:0 8px 25px rgba(0,0,0,.10);cursor:pointer;transition:background .15s,opacity .15s;
 }
 .chip svg{width:16px;height:16px;flex-shrink:0}
-.chip-event{background:rgba(201,64,145,.2);color:#c94091}
-.chip-konst{background:rgba(0,130,150,.2);color:#008296}
-.chip-motes{background:rgba(190,90,0,.2);color:#be5a00}
-.chip-musik{background:rgba(61,135,0,.2);color:#3d8700}
-.chip.chip-on.chip-event{background:rgba(201,64,145,.88);color:#fff}
-.chip.chip-on.chip-konst{background:rgba(0,130,150,.88);color:#fff}
-.chip.chip-on.chip-motes{background:rgba(190,90,0,.88);color:#fff}
-.chip.chip-on.chip-musik{background:rgba(61,135,0,.88);color:#fff}
-.chip.chip-on svg{stroke:#fff!important}
 .chip.chip-dim{opacity:.38}
 
 .filter-pill{
@@ -560,7 +551,7 @@ input:checked+.toggle-track::after{transform:translateX(20px)}
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.9089 4.00009C8.90016 3.99997 8.89139 3.99997 8.88261 4.00009H5C3.34315 4.00009 2 5.34323 2 7.00009V17.0001C2 18.6569 3.34315 20.0001 5 20.0001H8C8.54519 20.0001 8.98991 19.5634 8.99983 19.0183C8.99995 19.0122 9.00005 19.0062 9.00014 19.0001H14.9999C15 19.0062 15.0001 19.0122 15.0002 19.0183C15.0101 19.5634 15.4548 20.0001 16 20.0001H19C20.6569 20.0001 22 18.6569 22 17.0001V7.00009C22 5.34323 20.6569 4.00009 19 4.00009H15.1174C15.1086 3.99997 15.0998 3.99997 15.0911 4.00009H8.9089ZM16.0239 6.00009C15.9129 7.90884 16.1888 9.28648 16.8386 10.3166C17.4317 11.2569 18.4147 12.0298 20 12.6295V7.00009C20 6.4478 19.5523 6.00009 19 6.00009H16.0239ZM20 14.9928V17.0001C20 17.5524 19.5523 18.0001 19 18.0001H17.0794C17.2288 17.1936 17.5788 16.4906 18.0664 15.9713C18.556 15.45 19.2052 15.0889 20 14.9928ZM6.92056 18.0001C6.77118 17.1936 6.42121 16.4906 5.93359 15.9713C5.444 15.45 4.79484 15.0889 4 14.9928V17.0001C4 17.5524 4.44772 18.0001 5 18.0001H6.92056ZM4 12.6295V7.00009C4 6.4478 4.44772 6.00009 5 6.00009H7.97611C8.0871 7.90884 7.81117 9.28648 7.16142 10.3166C6.5683 11.2569 5.58534 12.0298 4 12.6295Z" fill="currentColor"/></svg>
         Event
       </button>
-      <button class="tab-btn" data-tab="konst" onclick="setTab('konst')">
+      <button class="tab-btn" data-tab="platser" onclick="setTab('platser')">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 3C3.567 3 2 4.567 2 6.5V17.5C2 19.433 3.567 21 5.5 21H18C19.6569 21 21 19.6569 21 18V14C21 13.4477 20.5523 13 20 13C19.4477 13 19 13.4477 19 14V18C19 18.5523 18.5523 19 18 19H5.5C4.67157 19 4 18.3284 4 17.5C4 16.6716 4.67157 16 5.5 16H7C7.55228 16 8 15.5523 8 15V8H10C10.5523 8 11 7.55228 11 7C11 6.44772 10.5523 6 10 6H8V4C8 3.44772 7.55228 3 7 3H5.5Z" fill="currentColor"/><path d="M17 12.01C16.84 12.01 16.69 11.97 16.55 11.9C16.41 11.83 13 10.09 13 7.01001C13 4.80001 14.79 3.01001 17 3.01001C19.21 3.01001 21 4.80001 21 7.01001C21 10.09 17.59 11.83 17.45 11.9C17.31 11.97 17.16 12.01 17 12.01Z" fill="currentColor"/></svg>
         Platser
       </button>
@@ -586,25 +577,71 @@ const S={
   calendar:`<svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`,
 };
 
-// Marker icons (white, for colored circle bg)
-const MSVG={
-  event:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c3.5-.5 6.5-.5 10 0 3.5-.5 6.5-.5 10 0v13c-3.5-.5-6.5-.5-10 0C8.5 18.5 5.5 18.5 2 19V6z"/><path d="M12 6v13"/></svg>`,
-  konst:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="white"/><circle cx="17.5" cy="10.5" r=".5" fill="white"/><circle cx="8.5" cy="7.5" r=".5" fill="white"/><circle cx="6.5" cy="12.5" r=".5" fill="white"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125A1.64 1.64 0 0115.314 17h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>`,
-  motes:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>`,
-  musik:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.998 18.5c0 1.38-1.343 2.5-3 2.5s-3-1.12-3-2.5 1.343-2.5 3-2.5 3 1.12 3 2.5zm0 0V7.488c0-.884.579-1.663 1.425-1.916l6-1.8c1.283-.385 2.575.576 2.575 1.916V15.5m0 0c0 1.38-1.343 2.5-3 2.5s-3-1.12-3-2.5 1.343-2.5 3-2.5 3 1.12 3 2.5z"/></svg>`,
+// Marker icons (white, for colored pin bg)
+const PIN_SVG={
+  musik:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M9.998 18.5c0 1.38-1.343 2.5-3 2.5s-3-1.12-3-2.5 1.343-2.5 3-2.5 3 1.12 3 2.5zm0 0V7.488c0-.884.579-1.663 1.425-1.916l6-1.8c1.283-.385 2.575.576 2.575 1.916V15.5m0 0c0 1.38-1.343 2.5-3 2.5s-3-1.12-3-2.5 1.343-2.5 3-2.5 3 1.12 3 2.5z"/></svg>`,
+  konst:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="13.5" cy="6.5" r=".5" fill="white"/><circle cx="17.5" cy="10.5" r=".5" fill="white"/><circle cx="8.5" cy="7.5" r=".5" fill="white"/><circle cx="6.5" cy="12.5" r=".5" fill="white"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125A1.64 1.64 0 0115.314 17h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>`,
+  teater:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M2 7c3-.5 5.5-.5 10 0 4.5-.5 7-.5 10 0v10c-3-.5-5.5-.5-10 0-4.5-.5-7-.5-10 0V7z"/><path d="M12 7v10"/></svg>`,
+  samhalle:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+  fritid:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
+  spel:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="15" rx="2"/><circle cx="8" cy="14" r="1.5" fill="white"/><circle cx="16" cy="14" r="1.5" fill="white"/><path d="M12 2v5M9 4l3-2 3 2"/></svg>`,
+  hantverk:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M14.5 2.5c0 1.5-1.5 3-3 3s-3-1.5-3-3h6zM3 21l9-9M14 10l5 5-3 3-5-5M21 4l-2 2"/></svg>`,
+  film:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 4v16M17 4v16M2 9h5M17 9h5M2 15h5M17 15h5"/></svg>`,
+  kurs:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+  motes:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>`,
+  galleri:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`,
+  bibliotek:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V2H6.5A2.5 2.5 0 0 0 4 4.5v15z"/></svg>`,
+  teaterlokal:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M2 7c3-.5 5.5-.5 10 0 4.5-.5 7-.5 10 0v10c-3-.5-5.5-.5-10 0-4.5-.5-7-.5-10 0V7z"/><path d="M12 7v10"/></svg>`,
+  museum:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M3 22V9M21 22V9M12 2L2 9h20L12 2zM5 22v-6h4v6M15 22v-6h4v6M9 22v-4h6v4"/></svg>`,
 };
+// fallback
+const MSVG=PIN_SVG;
 
-// Chip SVGs (colored, for top chips)
+// Chip SVGs (for filter chips)
 const CHIP_SVGS={
-  event:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c3.5-.5 6.5-.5 10 0 3.5-.5 6.5-.5 10 0v13c-3.5-.5-6.5-.5-10 0C8.5 18.5 5.5 18.5 2 19V6z"/><path d="M12 6v13"/></svg>`,
-  konst:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125A1.64 1.64 0 0115.314 17h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>`,
-  motes:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>`,
-  musik:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.998 18.5c0 1.38-1.343 2.5-3 2.5s-3-1.12-3-2.5 1.343-2.5 3-2.5 3 1.12 3 2.5zm0 0V7.488c0-.884.579-1.663 1.425-1.916l6-1.8c1.283-.385 2.575.576 2.575 1.916V15.5m0 0c0 1.38-1.343 2.5-3 2.5s-3-1.12-3-2.5 1.343-2.5 3-2.5 3 1.12 3 2.5z"/></svg>`,
+  musik:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.998 18.5c0 1.38-1.343 2.5-3 2.5s-3-1.12-3-2.5 1.343-2.5 3-2.5 3 1.12 3 2.5zm0 0V7.488c0-.884.579-1.663 1.425-1.916l6-1.8c1.283-.385 2.575.576 2.575 1.916V15.5m0 0c0 1.38-1.343 2.5-3 2.5s-3-1.12-3-2.5 1.343-2.5 3-2.5 3 1.12 3 2.5z"/></svg>`,
+  konst:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125A1.64 1.64 0 0115.314 17h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>`,
+  teater:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 7c3-.5 5.5-.5 10 0 4.5-.5 7-.5 10 0v10c-3-.5-5.5-.5-10 0-4.5-.5-7-.5-10 0V7z"/><path d="M12 7v10"/></svg>`,
+  samhalle:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+  fritid:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
+  spel:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="15" rx="2"/><circle cx="8" cy="14" r="1.5" fill="currentColor"/><circle cx="16" cy="14" r="1.5" fill="currentColor"/><path d="M12 2v5M9 4l3-2 3 2"/></svg>`,
+  hantverk:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.5 2.5c0 1.5-1.5 3-3 3s-3-1.5-3-3h6zM3 21l9-9M14 10l5 5-3 3-5-5"/></svg>`,
+  film:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 4v16M17 4v16M2 9h5M17 9h5M2 15h5M17 15h5"/></svg>`,
+  kurs:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+  motes:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>`,
+  galleri:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`,
+  bibliotek:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20V2H6.5A2.5 2.5 0 0 0 4 4.5v15z"/></svg>`,
+  teaterlokal:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 7c3-.5 5.5-.5 10 0 4.5-.5 7-.5 10 0v10c-3-.5-5.5-.5-10 0-4.5-.5-7-.5-10 0V7z"/><path d="M12 7v10"/></svg>`,
+  museum:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 22V9M21 22V9M12 2L2 9h20L12 2zM5 22v-6h4v6M15 22v-6h4v6M9 22v-4h6v4"/></svg>`,
 };
 
-const CAT_COLOR={event:'#c94091',konst:'#008296',motes:'#be5a00',musik:'#3d8700'};
-const CAT_BG={event:'rgba(201,64,145,.14)',konst:'rgba(0,130,150,.14)',motes:'rgba(190,90,0,.14)',musik:'rgba(61,135,0,.14)'};
-const CAT_LABEL={event:'Event',konst:'Konst',motes:'Mötesplats',musik:'Musik'};
+// Kategorier: events (tidsbaserade) + platser (permanenta)
+const EVENT_CATS=['musik','konst','teater','samhalle','fritid','spel','hantverk','film','kurs'];
+const PLATS_CATS=['motes','galleri','bibliotek','teaterlokal','museum'];
+
+const CAT_COLOR={
+  // Events
+  musik:'#3d8700', konst:'#008296', teater:'#7C3AED',
+  samhalle:'#1D4ED8', fritid:'#EA580C', spel:'#C94091',
+  hantverk:'#92400E', film:'#374151', kurs:'#0284C7',
+  // Platser
+  motes:'#BE5A00', galleri:'#008296', bibliotek:'#1D4ED8',
+  teaterlokal:'#7C3AED', museum:'#6D28D9',
+};
+const CAT_BG={
+  musik:'rgba(61,135,0,.14)', konst:'rgba(0,130,150,.14)', teater:'rgba(124,58,237,.14)',
+  samhalle:'rgba(29,78,216,.14)', fritid:'rgba(234,88,12,.14)', spel:'rgba(201,64,145,.14)',
+  hantverk:'rgba(146,64,14,.14)', film:'rgba(55,65,81,.14)', kurs:'rgba(2,132,199,.14)',
+  motes:'rgba(190,90,0,.14)', galleri:'rgba(0,130,150,.14)', bibliotek:'rgba(29,78,216,.14)',
+  teaterlokal:'rgba(124,58,237,.14)', museum:'rgba(109,40,217,.14)',
+};
+const CAT_LABEL={
+  musik:'Musik', konst:'Konst', teater:'Teater',
+  samhalle:'Samhälle', fritid:'Fritid', spel:'Spel',
+  hantverk:'Hantverk', film:'Film', kurs:'Kurs',
+  motes:'Mötesplats', galleri:'Galleri', bibliotek:'Bibliotek',
+  teaterlokal:'Teaterlokal', museum:'Museum',
+};
 const AREAS_LIST=[
   {id:'flemingsberg',name:'Flemingsberg'},{id:'huddinge',name:'Huddinge'},
   {id:'skogas',name:'Skogås'},{id:'sjodalen',name:'Sjödalen'},
@@ -648,9 +685,10 @@ function initMap(){
 
 function mHtml(cat,big){
   const sz=big?'mpin-lg':'mpin-sm', wt=big?87.6:62.7, p=big?'16px':'10px';
+  const icon=PIN_SVG[cat]||PIN_SVG['motes'];
   return `<div class="mpin ${sz}" style="width:${wt}px;height:${wt}px">
     <div class="mpin-tail"></div>
-    <div class="mpin-circle" style="background:${CAT_COLOR[cat]};padding:${p}">${MSVG[cat]}</div>
+    <div class="mpin-circle" style="background:${CAT_COLOR[cat]||'#555'};padding:${p}">${icon}</div>
   </div>`;
 }
 
@@ -773,11 +811,7 @@ function setTab(tab){
     renderCalendar();
   } else {
     document.getElementById('calendarView').classList.remove('visible');
-    if(tab==='konst'){
-      selectedCat='konst';
-    } else {
-      selectedCat=null;
-    }
+    selectedCat=null;
     renderChips();
     applyFilters();
   }
@@ -786,6 +820,10 @@ function setTab(tab){
 // ── FILTER LOGIC ───────────────────────────────────────────────────────
 function getVisible(){
   return ITEMS.filter(i=>{
+    // Tab-based type filter
+    if(activeTab==='event' && i.type!=='event') return false;
+    if(activeTab==='platser' && i.type!=='plats') return false;
+    if(activeTab==='kalender' && i.type!=='event') return false;
     if(selectedCat && i.cat!==selectedCat) return false;
     if(filterState.free && !i.free) return false;
     if(filterState.orgs.size>0 && !filterState.orgs.has(i.host)) return false;
@@ -852,20 +890,23 @@ function closeFilter(){
 
 // ── CATEGORY CHIPS ─────────────────────────────────────────────────────
 function selectCat(cat){
-  if(activeTab==='konst'){ selectedCat=null; setTab('event'); return; }
   selectedCat=(selectedCat===cat)?null:cat;
   renderChips(); applyFilters();
 }
 
 function chipHtml(cat){
   const isOn=selectedCat===cat, isDim=selectedCat!==null&&!isOn;
-  return `<button class="chip chip-${cat}${isOn?' chip-on':''}${isDim?' chip-dim':''}" onclick="selectCat('${cat}')">
-    ${CHIP_SVGS[cat]}${CAT_LABEL[cat]}
+  const col=CAT_COLOR[cat];
+  const bg=isOn?col:CAT_BG[cat];
+  const textCol=isOn?'#fff':col;
+  return `<button class="chip${isDim?' chip-dim':''}" style="background:${bg};color:${textCol}" onclick="selectCat('${cat}')">
+    ${CHIP_SVGS[cat]||''}${CAT_LABEL[cat]}
   </button>`;
 }
 
 function renderChips(){
-  const html=['event','konst','motes','musik'].map(c=>chipHtml(c)).join('');
+  const cats = activeTab==='platser' ? PLATS_CATS : EVENT_CATS;
+  const html = cats.map(c=>chipHtml(c)).join('');
   const tc=document.getElementById('topChips'); if(tc) tc.innerHTML=html;
   const cc=document.getElementById('calChips'); if(cc) cc.innerHTML=html;
 }
