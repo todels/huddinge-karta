@@ -110,7 +110,7 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
 }
 #cardScroll::-webkit-scrollbar{display:none}
 /* Spacers för korrekt padding i scroll-containers */
-#cardScroll::before,#cardScroll::after{content:'';flex-shrink:0;width:16px}
+#cardScroll::before,#cardScroll::after{content:'';display:block;flex-shrink:0;min-width:16px;width:16px}
 #cardScroll.single-card{overflow-x:hidden;padding-left:16px;padding-right:16px}
 #cardScroll.single-card::before,#cardScroll.single-card::after{display:none}
 #cardScroll.single-card .ev-card{width:100%}
