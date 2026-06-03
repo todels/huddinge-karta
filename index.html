@@ -71,6 +71,15 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
 /* ══ MARKERS ══ */
 .mpin{position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s}
 .mpin:hover{transform:scale(1.08)}
+.pin-label{
+  position:absolute;left:calc(100% + 6px);top:4px;
+  background:#fff;padding:3px 8px;border-radius:20px;
+  font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:#000;
+  white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.13);
+  pointer-events:none;display:none;
+  max-width:120px;overflow:hidden;text-overflow:ellipsis;
+}
+#map.labels-visible .pin-label{display:block}
 .mpin-tail{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(45deg);background:white;border-radius:80px 80px 4px 80px;box-shadow:0 6px 12px rgba(0,0,0,.12),0 16px 32px rgba(0,0,0,.10)}
 .mpin-circle{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;border-radius:50%}
 .mpin-circle svg{width:24px;height:24px}
@@ -681,14 +690,22 @@ function initMap(){
   rebuildClusterMarkers();
   map.on('click',()=>{ if(activeIds.length) dismissCards(); });
   window.addEventListener('resize',()=>map.invalidateSize());
+  // Visa platsetiketter bara vid zoom ≥ 15
+  function updateLabelVisibility(){
+    document.getElementById('map').classList.toggle('labels-visible', map.getZoom()>=15);
+  }
+  map.on('zoomend', updateLabelVisibility);
+  updateLabelVisibility();
 }
 
-function mHtml(cat,big){
+function mHtml(cat,big,label){
   const sz=big?'mpin-lg':'mpin-sm', wt=big?87.6:62.7, p=big?'16px':'10px';
   const icon=PIN_SVG[cat]||PIN_SVG['motes'];
+  const lbl=label?`<div class="pin-label">${label}</div>`:'';
   return `<div class="mpin ${sz}" style="width:${wt}px;height:${wt}px">
     <div class="mpin-tail"></div>
     <div class="mpin-circle" style="background:${CAT_COLOR[cat]||'#555'};padding:${p}">${icon}</div>
+    ${lbl}
   </div>`;
 }
 
@@ -709,7 +726,10 @@ function mClusterHtml(cluster,big){
 function addClusterMarker(cluster){
   const isActive=cluster.items.some(i=>activeIds.includes(i.id));
   const big=isActive;
-  const html=cluster.items.length>1?mClusterHtml(cluster,big):mHtml(cluster.items[0].cat,big);
+  const single=cluster.items.length===1;
+  const item=cluster.items[0];
+  const label=single&&item.type==='plats'?item.name:null;
+  const html=single?mHtml(item.cat,big,label):mClusterHtml(cluster,big);
   const sz=big?87.6:62.7;
   const icon=L.divIcon({html,className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz]});
   const m=L.marker([cluster.lat,cluster.lng],{icon}).addTo(map);
@@ -722,7 +742,10 @@ function refreshClusterByItemId(id){
   const m=leafMarkers[cluster.key]; if(!m)return;
   const isActive=cluster.items.some(i=>activeIds.includes(i.id));
   const big=isActive;
-  const html=cluster.items.length>1?mClusterHtml(cluster,big):mHtml(cluster.items[0].cat,big);
+  const single=cluster.items.length===1;
+  const item0=cluster.items[0];
+  const label=single&&item0.type==='plats'?item0.name:null;
+  const html=single?mHtml(item0.cat,big,label):mClusterHtml(cluster,big);
   const sz=big?87.6:62.7;
   m.setIcon(L.divIcon({html,className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz]}));
 }
