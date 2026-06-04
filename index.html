@@ -32,11 +32,12 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
   scrollbar-width:none;-webkit-overflow-scrolling:touch;
   /* Vertical padding so chip shadows aren't clipped */
   padding:6px 0;margin:-6px 0;
-  /* No mask — instead rely on ::after spacer so last chip is reachable */
+  -webkit-mask-image:linear-gradient(to right,black calc(100% - 48px),transparent 100%);
+  mask-image:linear-gradient(to right,black calc(100% - 48px),transparent 100%);
 }
 #topChips::-webkit-scrollbar{display:none}
-/* Spacer after last chip so it scrolls fully into view */
-#topChips::after{content:'';flex-shrink:0;width:16px;display:block;min-width:16px}
+/* Spacer after last chip so it scrolls fully into view when at end */
+#topChips::after{content:'';flex-shrink:0;width:48px;display:block;min-width:48px}
 
 .chip{
   display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 10px 0 8px;
