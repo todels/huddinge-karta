@@ -692,12 +692,7 @@ function initMap(){
   rebuildClusterMarkers();
   map.on('click',()=>{ if(activeIds.length) dismissCards(); });
   window.addEventListener('resize',()=>map.invalidateSize());
-  // Visa platsetiketter bara vid zoom ≥ 15
-  function updateLabelVisibility(){
-    document.getElementById('map').classList.toggle('labels-visible', map.getZoom()>=15);
-  }
-  map.on('zoomend', updateLabelVisibility);
-  updateLabelVisibility();
+  document.getElementById('map').classList.add('labels-visible');
 }
 
 function mHtml(cat,big,label){
