@@ -687,6 +687,7 @@ function initMap(){
   L.marker([59.2183,17.9384],{icon:ui,interactive:false}).addTo(map);
   rebuildClusterMarkers();
   map.on('click',()=>{ if(activeIds.length) dismissCards(); });
+  map.on('zoomend moveend', ()=>setTimeout(checkLabelCollisions, 80));
   window.addEventListener('resize',()=>map.invalidateSize());
   document.getElementById('map').classList.add('labels-visible');
 }
@@ -748,6 +749,28 @@ function rebuildClusterMarkers(){
   leafMarkers={};
   clusters=buildClusters(getVisible());
   clusters.forEach(addClusterMarker);
+  setTimeout(checkLabelCollisions, 80);
+}
+
+function checkLabelCollisions(){
+  const labels = Array.from(document.querySelectorAll('.pin-label'));
+  // Reset
+  labels.forEach(l => l.style.visibility = '');
+  // Get rects of visible labels only
+  const items = labels.map(l => ({ el:l, r:l.getBoundingClientRect() }))
+                      .filter(({r}) => r.width > 0);
+  const PAD = 6;
+  for(let i=0; i<items.length; i++){
+    if(items[i].el.style.visibility === 'hidden') continue;
+    const a = items[i].r;
+    for(let j=i+1; j<items.length; j++){
+      if(items[j].el.style.visibility === 'hidden') continue;
+      const b = items[j].r;
+      const overlap = !(a.right+PAD < b.left-PAD || b.right+PAD < a.left-PAD ||
+                        a.bottom+PAD < b.top-PAD  || b.bottom+PAD < a.top-PAD);
+      if(overlap) items[j].el.style.visibility = 'hidden';
+    }
+  }
 }
 
 function showCards(ids){
