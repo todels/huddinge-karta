@@ -688,7 +688,7 @@ function initMap(){
   });
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
   const ui=L.divIcon({html:`<div class="user-dot"><div class="user-dot-inner"></div></div>`,className:'',iconSize:[26,26],iconAnchor:[13,13]});
-  L.marker([59.2195,17.9490],{icon:ui,interactive:false}).addTo(map);
+  L.marker([59.2183,17.9384],{icon:ui,interactive:false}).addTo(map);
   rebuildClusterMarkers();
   map.on('click',()=>{ if(activeIds.length) dismissCards(); });
   window.addEventListener('resize',()=>map.invalidateSize());
