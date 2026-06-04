@@ -32,8 +32,8 @@ html,body{height:100%;overflow:hidden;background:#111;overscroll-behavior:none;f
   scrollbar-width:none;-webkit-overflow-scrolling:touch;
   /* Vertical padding so chip shadows aren't clipped */
   padding:6px 0;margin:-6px 0;
-  -webkit-mask-image:linear-gradient(to right,black calc(100% - 48px),transparent 100%);
-  mask-image:linear-gradient(to right,black calc(100% - 48px),transparent 100%);
+  -webkit-mask-image:linear-gradient(to right,transparent 0%,black 20px,black calc(100% - 48px),transparent 100%);
+  mask-image:linear-gradient(to right,transparent 0%,black 20px,black calc(100% - 48px),transparent 100%);
 }
 #topChips::-webkit-scrollbar{display:none}
 /* Spacer after last chip so it scrolls fully into view when at end */
