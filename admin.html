@@ -550,9 +550,9 @@ function doLogin(){
     // Load from main events.json if empty
     if(items.length===0){
       fetch('events.json').then(r=>r.json()).then(data=>{
-        items=data; saveItems(); renderAll();
-      }).catch(()=>renderAll());
-    } else { renderAll(); }
+        items=data; saveItems(); renderAll(); renderAdminMarkers();
+      }).catch(()=>{renderAll();renderAdminMarkers();});
+    } else { renderAll(); renderAdminMarkers(); }
     initAdminMap();
   } else {
     const err=document.getElementById('loginErr');
@@ -567,11 +567,42 @@ function doLogout(){
 }
 
 // ── MAP ────────────────────────────────────────────────────────────────
+const ADMIN_CAT_COLOR={musik:'#3d8700',konst:'#008296',teater:'#c0136f',samhalle:'#666cd8',fritid:'#be5a00',spel:'#6e19bb',hantverk:'#8f3c00',film:'#260096',kurs:'#4781ce',motes:'#be5a00',fastkonst:'#008296'};
+const ADMIN_BOUNDS=L.latLngBounds([59.08,17.73],[59.34,18.24]);
+let adminMarkers=[];
+
 function initAdminMap(){
   if(adminMap) return;
-  adminMap=L.map('adminMap',{center:[59.218,17.978],zoom:12,zoomControl:false,attributionControl:false});
+  adminMap=L.map('adminMap',{
+    center:[59.218,17.978],zoom:12,minZoom:11,maxZoom:19,
+    maxBounds:ADMIN_BOUNDS,maxBoundsViscosity:1,
+    zoomControl:false,attributionControl:false
+  });
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(adminMap);
-  setTimeout(()=>adminMap.invalidateSize(),200);
+  // User dot at Södertörns högskola
+  const ui=L.divIcon({html:`<div style="width:26px;height:26px;border-radius:50%;background:white;box-shadow:0 4px 8px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center"><div style="width:18px;height:18px;border-radius:50%;background:#357af6"></div></div>`,className:'',iconSize:[26,26],iconAnchor:[13,13]});
+  L.marker([59.2183,17.9384],{icon:ui,interactive:false}).addTo(adminMap);
+  setTimeout(()=>{adminMap.invalidateSize();renderAdminMarkers();},200);
+}
+
+function renderAdminMarkers(){
+  if(!adminMap) return;
+  adminMarkers.forEach(m=>{try{adminMap.removeLayer(m);}catch(e){}});
+  adminMarkers=[];
+  items.forEach(item=>{
+    const col=ADMIN_CAT_COLOR[item.cat]||'#555';
+    const sz=44.3, p='8px';
+    const html=`<div style="position:relative;width:${sz}px;height:${sz}px;display:flex;align-items:center;justify-content:center;cursor:pointer">
+      <div style="position:absolute;inset:0;transform:translate(-50%,-50%) rotate(45deg) translate(50%,50%);background:white;border-radius:80px 80px 4px 80px;box-shadow:0 6px 12px rgba(0,0,0,.12),0 16px 32px rgba(0,0,0,.10);width:${sz*0.707}px;height:${sz*0.707}px;top:${sz*0.146}px;left:${sz*0.146}px"></div>
+      <div style="position:relative;z-index:1;width:40px;height:40px;border-radius:50%;background:${col};padding:${p};display:flex;align-items:center;justify-content:center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+      </div>
+    </div>`;
+    const icon=L.divIcon({html,className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz]});
+    const m=L.marker([item.lat,item.lng],{icon}).addTo(adminMap);
+    m.bindPopup(`<strong>${item.name}</strong><br>${item.desc||''}`);
+    adminMarkers.push(m);
+  });
 }
 
 // ── NAVIGATION ─────────────────────────────────────────────────────────
