@@ -3,49 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Huddinge Karta — Admin</title>
+<title>Huddinge Karta — Adminportal</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
-body{font-family:'Inter',sans-serif;background:#f2f2f7;color:#000;min-height:100vh}
-
-/* ── TOKENS ── */
-:root{
-  --event:#bf5917;--event-bg:rgba(209,96,23,.12);
-  --konst:#068a99;--konst-bg:rgba(71,193,206,.12);
-  --motes:#c0136f;--motes-bg:rgba(209,66,142,.12);
-  --musik:#c3a523;--musik-bg:rgba(248,216,75,.2);
-  --radius:16px;--card-shadow:0 2px 16px rgba(0,0,0,.07);
-}
+body{font-family:'Inter',sans-serif;background:#fff;color:#000;min-height:100vh;overflow:hidden}
 
 /* ── LOGIN ── */
 #loginScreen{
   position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
-  z-index:1000;
+  background:#16213e;z-index:1000;
 }
 .login-box{
-  background:#fff;border-radius:28px;padding:48px 40px;width:min(400px,92vw);
-  box-shadow:0 40px 100px rgba(0,0,0,.4);
+  background:#fff;border-radius:24px;padding:48px 40px;width:min(480px,92vw);
+  box-shadow:0 24px 80px rgba(0,0,0,.3);
 }
-.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:32px}
-.login-logo-mark{
-  width:48px;height:48px;border-radius:14px;background:#000;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+.login-logo{display:flex;align-items:center;gap:16px;margin-bottom:32px}
+.login-logo-img{width:37px;height:50px;object-fit:contain}
+.login-logo-text{font-size:24px;font-weight:600;color:#000;line-height:1.1}
+.login-logo-sub{font-size:14px;color:rgba(0,0,0,.6);font-weight:500;margin-top:4px}
+.login-title{font-size:24px;font-weight:600;color:#000;line-height:2}
+.login-subtitle{font-size:16px;color:rgba(0,0,0,.5);font-weight:500;margin-bottom:40px}
+.login-field{margin-bottom:25px}
+.login-field label{display:block;font-size:16px;font-weight:500;color:rgba(0,0,0,.6);margin-bottom:14px}
+.login-field input{
+  width:100%;border:1px solid rgba(0,0,0,.22);border-radius:12px;
+  padding:16px;font-family:'Inter',sans-serif;font-size:16px;color:#000;
+  outline:none;transition:border-color .2s;background:#fff;
 }
-.login-logo-mark svg{width:28px;height:28px}
-.login-logo-text{font-size:20px;font-weight:700;color:#000;line-height:1.1}
-.login-logo-sub{font-size:13px;color:rgba(0,0,0,.4);font-weight:400;margin-top:2px}
-.login-title{font-size:26px;font-weight:700;margin-bottom:6px}
-.login-sub{font-size:14px;color:rgba(0,0,0,.5);margin-bottom:32px}
-.field{margin-bottom:16px}
-.field label{display:block;font-size:13px;font-weight:600;color:rgba(0,0,0,.5);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
-.field input{
-  width:100%;height:52px;border-radius:14px;border:1.5px solid rgba(0,0,0,.1);
-  padding:0 16px;font-family:'Inter',sans-serif;font-size:16px;color:#000;
-  outline:none;transition:border-color .2s;background:#fafafa;
-}
-.field input:focus{border-color:#000;background:#fff}
+.login-field input:focus{border-color:rgba(0,0,0,.5)}
 .login-btn{
   width:100%;height:52px;border-radius:14px;background:#000;border:none;
   font-family:'Inter',sans-serif;font-size:16px;font-weight:600;color:#fff;
@@ -55,125 +42,120 @@ body{font-family:'Inter',sans-serif;background:#f2f2f7;color:#000;min-height:100
 .login-err{background:rgba(255,59,48,.1);color:#ff3b30;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:500;margin-top:12px;display:none}
 
 /* ── APP SHELL ── */
-#app{display:none;min-height:100vh}
-@media(min-width:768px){#app{display:flex}}
+#app{display:none;height:100vh;overflow:hidden}
+@media(min-width:768px){#app{display:flex;flex-direction:column}}
 
-/* ── SIDEBAR ── */
-#sidebar{
-  width:260px;flex-shrink:0;background:#fff;min-height:100vh;
-  border-right:.5px solid rgba(0,0,0,.08);
-  display:flex;flex-direction:column;position:sticky;top:0;
+/* ── TOPBAR ── */
+#topBar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 32px;background:#fff;border-bottom:.5px solid rgba(0,0,0,.08);
+  flex-shrink:0;
 }
-.sidebar-head{padding:28px 24px 20px;border-bottom:.5px solid rgba(0,0,0,.06)}
-.sidebar-logo{display:flex;align-items:center;gap:10px}
-.sidebar-logo-mark{width:36px;height:36px;border-radius:10px;background:#000;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sidebar-logo-mark svg{width:20px;height:20px}
-.sidebar-logo-text{font-size:15px;font-weight:700;line-height:1.1}
-.sidebar-logo-sub{font-size:11px;color:rgba(0,0,0,.4)}
-.sidebar-nav{padding:16px 12px;flex:1}
-.nav-section-title{font-size:11px;font-weight:600;color:rgba(0,0,0,.35);text-transform:uppercase;letter-spacing:.06em;padding:0 12px;margin-bottom:6px;margin-top:12px}
-.nav-item{
-  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
-  cursor:pointer;font-size:14px;font-weight:500;color:rgba(0,0,0,.7);
-  transition:background .15s,color .15s;margin-bottom:2px;
+.tb-logo{display:flex;align-items:center;gap:16px}
+.tb-logo-img{width:28px;height:38px;object-fit:contain}
+.tb-logo-name{font-size:20px;font-weight:600;color:#000}
+.tb-logo-sub{font-size:12px;color:rgba(0,0,0,.5);font-weight:500;margin-top:2px}
+.tb-actions{display:flex;gap:12px;align-items:center}
+.btn-ghost-tb{
+  display:inline-flex;align-items:center;gap:8px;padding:12px 20px;
+  border-radius:16px;border:none;
+  background:rgba(229,229,229,.6);backdrop-filter:blur(4px);
+  font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:#000;
+  cursor:pointer;transition:background .15s;
 }
-.nav-item:hover{background:rgba(0,0,0,.05)}
-.nav-item.active{background:#000;color:#fff}
-.nav-item svg{width:18px;height:18px;flex-shrink:0}
-.nav-count{margin-left:auto;background:rgba(0,0,0,.08);border-radius:20px;padding:2px 8px;font-size:12px;font-weight:600}
-.nav-item.active .nav-count{background:rgba(255,255,255,.2)}
-.sidebar-foot{padding:16px 12px;border-top:.5px solid rgba(0,0,0,.06)}
-.logout-btn{
-  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
-  cursor:pointer;font-size:14px;font-weight:500;color:rgba(0,0,0,.5);width:100%;
-  background:none;border:none;font-family:'Inter',sans-serif;transition:background .15s;
+.btn-ghost-tb:hover{background:rgba(210,210,210,.7)}
+.btn-primary-tb{
+  display:inline-flex;align-items:center;gap:8px;padding:12px 20px;
+  border-radius:16px;border:none;background:#000;
+  font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:#fff;
+  cursor:pointer;transition:opacity .2s;
 }
-.logout-btn:hover{background:rgba(0,0,0,.05)}
+.btn-primary-tb:hover{opacity:.82}
+.btn-primary-tb svg,.btn-ghost-tb svg{width:20px;height:20px;flex-shrink:0}
 
-/* ── MAIN ── */
-#main{flex:1;min-width:0;padding:32px}
+/* ── BODY LAYOUT ── */
+#body{display:flex;flex:1;min-height:0;overflow:hidden}
+
+/* ── CONTENT AREA ── */
+#content{
+  flex:0 0 640px;min-width:0;overflow-y:auto;padding:32px;
+  scrollbar-width:none;
+}
+#content::-webkit-scrollbar{display:none}
+
+/* ── MAP AREA ── */
+#mapArea{flex:1;min-width:0;position:relative}
+#adminMap{position:absolute;inset:0}
+.leaflet-control-zoom,.leaflet-control-attribution{display:none!important}
+
+/* ── PAGES ── */
 .page{display:none}
 .page.active{display:block}
 
-/* ── PAGE HEADER ── */
-.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:gap;gap:12px}
-.page-title{font-size:28px;font-weight:700}
-.page-sub{font-size:14px;color:rgba(0,0,0,.45);margin-top:3px}
-.btn-primary{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:12px 20px;border-radius:12px;background:#000;border:none;
-  font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#fff;
-  cursor:pointer;transition:opacity .2s;white-space:nowrap;flex-shrink:0;
+/* ── LIST PAGE ── */
+.list-title{font-size:40px;font-weight:600;color:#000;line-height:1.2;margin-bottom:4px}
+.list-sub{font-size:24px;font-weight:500;color:rgba(0,0,0,.5);margin-bottom:24px}
+
+/* Category chips with count */
+.cat-chips-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.cat-chip-stat{
+  display:inline-flex;align-items:center;gap:4px;height:32px;
+  padding:4px 4px 4px 8px;border-radius:40px;border:none;
+  font-family:'Inter',sans-serif;cursor:pointer;transition:opacity .15s;
+  flex-shrink:0;
 }
-.btn-primary:hover{opacity:.82}
-.btn-ghost{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:12px 20px;border-radius:12px;background:rgba(0,0,0,.06);border:none;
-  font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#000;
-  cursor:pointer;transition:background .15s;white-space:nowrap;
+.cat-chip-stat:hover{opacity:.8}
+.cat-chip-stat svg{width:18px;height:18px;flex-shrink:0}
+.cat-chip-stat-label{font-size:15px;font-weight:500;white-space:nowrap;margin:0 2px}
+.cat-chip-stat-badge{
+  display:inline-flex;align-items:center;padding:3px 8px;border-radius:32px;
+  font-size:14px;font-weight:500;margin-left:2px;
 }
-.btn-ghost:hover{background:rgba(0,0,0,.1)}
-.btn-danger{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:8px 14px;border-radius:10px;background:rgba(255,59,48,.1);border:none;
-  font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#ff3b30;
+.cat-chip-stat.active-filter{outline:2px solid currentColor;outline-offset:1px}
+
+/* Event rows */
+.items-list{display:flex;flex-direction:column;gap:12px}
+.item-row{
+  background:#fff;border-radius:16px;padding:8px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  box-shadow:0 2px 16px rgba(0,0,0,.07);
+}
+.item-row-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.item-thumb{width:72px;height:72px;border-radius:12px;object-fit:cover;background:#e8e8e8;flex-shrink:0}
+.item-info{flex:1;min-width:0}
+.item-name-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.item-name{font-size:15px;font-weight:600;color:#000;white-space:nowrap}
+.item-badges{display:flex;gap:4px;flex-wrap:wrap}
+.item-cat-badge{display:inline-flex;align-items:center;padding:4px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.item-price-badge{display:inline-flex;align-items:center;padding:4px 8px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(0,0,0,.12);color:#000}
+.item-desc{font-size:13px;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-actions{display:flex;align-items:center;gap:13px;padding:0 8px;flex-shrink:0}
+.edit-btn{
+  height:36px;padding:0 12px;border-radius:10px;background:rgba(0,0,0,.06);border:none;
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#000;cursor:pointer;
+  transition:background .15s;opacity:.8;
+}
+.edit-btn:hover{background:rgba(0,0,0,.12);opacity:1}
+.del-btn{
+  display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;
+  border-radius:10px;background:rgba(255,59,48,.1);border:none;
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#900;
   cursor:pointer;transition:background .15s;
 }
-.btn-danger:hover{background:rgba(255,59,48,.18)}
+.del-btn:hover{background:rgba(255,59,48,.18)}
+.del-btn svg{width:18px;height:18px;flex-shrink:0}
 
-/* ── STATS ── */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:28px}
-.stat-card{background:#fff;border-radius:var(--radius);padding:20px;box-shadow:var(--card-shadow)}
-.stat-num{font-size:32px;font-weight:700;line-height:1}
-.stat-label{font-size:13px;color:rgba(0,0,0,.45);font-weight:500;margin-top:4px}
-.stat-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
-
-/* ── FILTER BAR ── */
-.filter-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
-.filter-pill{
-  height:34px;padding:0 14px;border-radius:40px;border:.5px solid rgba(0,0,0,.14);
-  background:#fff;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;
-  color:rgba(0,0,0,.7);cursor:pointer;transition:all .15s;
-}
-.filter-pill.on{background:#000;color:#fff;border-color:#000}
-.search-box{
-  flex:1;min-width:180px;height:36px;border-radius:40px;border:.5px solid rgba(0,0,0,.14);
-  padding:0 14px 0 36px;font-family:'Inter',sans-serif;font-size:13px;
-  background:#fff url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='6.5' cy='6.5' r='4.5' stroke='%23999' stroke-width='1.5'/%3E%3Cpath d='M13 13l-2.5-2.5' stroke='%23999' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") 12px center no-repeat;
-  outline:none;
-}
-
-/* ── ITEM LIST ── */
-.items-grid{display:flex;flex-direction:column;gap:10px}
-.item-card{
-  background:#fff;border-radius:var(--radius);
-  display:flex;align-items:center;gap:16px;padding:16px;
-  box-shadow:var(--card-shadow);transition:box-shadow .15s;
-}
-.item-card:hover{box-shadow:0 4px 24px rgba(0,0,0,.1)}
-.item-thumb{width:72px;height:72px;border-radius:12px;object-fit:cover;background:#eee;flex-shrink:0}
-.item-info{flex:1;min-width:0}
-.item-name{font-size:15px;font-weight:600;color:#000;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.item-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.cat-badge{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:20px;font-size:11px;font-weight:600}
-.area-badge{font-size:12px;color:rgba(0,0,0,.45)}
-.free-badge{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:20px;font-size:11px;font-weight:600;background:rgba(52,199,89,.12);color:#1a7a38}
-.item-desc{font-size:13px;color:rgba(0,0,0,.5);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.item-actions{display:flex;gap:8px;flex-shrink:0}
-.edit-btn{
-  padding:8px 14px;border-radius:10px;background:rgba(0,0,0,.06);border:none;
-  font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#000;cursor:pointer;transition:background .15s;
-}
-.edit-btn:hover{background:rgba(0,0,0,.12)}
+/* Empty */
+.empty{text-align:center;padding:60px 24px;color:rgba(0,0,0,.3);font-size:15px}
 
 /* ── FORM PAGE ── */
 .form-back{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:15px;font-weight:500;color:rgba(0,0,0,.5);margin-bottom:24px;width:fit-content}
 .form-back:hover{color:#000}
 .form-back svg{width:18px;height:18px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-@media(max-width:900px){.form-grid{grid-template-columns:1fr}}
-.form-card{background:#fff;border-radius:var(--radius);padding:24px;box-shadow:var(--card-shadow)}
-.form-card-title{font-size:16px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.form-page-title{font-size:32px;font-weight:600;margin-bottom:4px}
+.form-page-sub{font-size:15px;color:rgba(0,0,0,.45);margin-bottom:28px}
+.form-card{background:#fff;border-radius:16px;padding:24px;box-shadow:0 2px 16px rgba(0,0,0,.07);margin-bottom:16px}
+.form-card-title{font-size:16px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px;color:#000}
 .form-card-title svg{width:18px;height:18px;opacity:.5}
 .form-field{margin-bottom:18px}
 .form-field:last-child{margin-bottom:0}
@@ -181,24 +163,25 @@ body{font-family:'Inter',sans-serif;background:#f2f2f7;color:#000;min-height:100
 .form-input,.form-select,.form-textarea{
   width:100%;border:1.5px solid rgba(0,0,0,.1);border-radius:12px;
   padding:11px 14px;font-family:'Inter',sans-serif;font-size:15px;color:#000;
-  background:#fafafa;outline:none;transition:border-color .2s,background .2s;
+  background:#fafafa;outline:none;transition:border-color .2s;
 }
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:#000;background:#fff}
 .form-textarea{resize:vertical;min-height:100px;line-height:1.5}
 .form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer}
 .form-hint{font-size:12px;color:rgba(0,0,0,.4);margin-top:5px}
-/* Category pills */
 .cat-pills{display:flex;gap:8px;flex-wrap:wrap}
-.cat-pill{
-  padding:8px 16px;border-radius:40px;border:1.5px solid rgba(0,0,0,.1);
-  font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;
-  background:#fff;transition:all .15s;
-}
-.cat-pill.on-event{background:var(--event-bg);color:var(--event);border-color:var(--event)}
-.cat-pill.on-konst{background:var(--konst-bg);color:var(--konst);border-color:var(--konst)}
-.cat-pill.on-motes{background:var(--motes-bg);color:var(--motes);border-color:var(--motes)}
-.cat-pill.on-musik{background:var(--musik-bg);color:var(--musik);border-color:var(--musik)}
-/* Toggle */
+.cat-pill{padding:8px 16px;border-radius:40px;border:1.5px solid rgba(0,0,0,.1);font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;background:#fff;transition:all .15s}
+.cat-pill.on-musik{background:rgba(139,183,102,.2);color:#3d8700;border-color:#3d8700}
+.cat-pill.on-konst{background:rgba(102,180,192,.2);color:#008296;border-color:#008296}
+.cat-pill.on-teater{background:rgba(223,140,189,.2);color:#c0136f;border-color:#c0136f}
+.cat-pill.on-samhalle{background:rgba(102,108,216,.2);color:#666cd8;border-color:#666cd8}
+.cat-pill.on-fritid{background:rgba(216,156,102,.2);color:#be5a00;border-color:#be5a00}
+.cat-pill.on-spel{background:rgba(142,21,255,.2);color:#6e19bb;border-color:#6e19bb}
+.cat-pill.on-hantverk{background:rgba(187,79,7,.2);color:#8f3c00;border-color:#8f3c00}
+.cat-pill.on-film{background:rgba(38,0,150,.2);color:#260096;border-color:#260096}
+.cat-pill.on-kurs{background:rgba(71,129,206,.2);color:#4781ce;border-color:#4781ce}
+.time-row{display:grid;grid-template-columns:1fr 22px 1fr;gap:8px;align-items:center}
+.time-sep{font-size:20px;color:rgba(0,0,0,.25);text-align:center;padding-top:9px}
 .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:.5px solid rgba(0,0,0,.07)}
 .toggle-row:last-child{border-bottom:none;padding-bottom:0}
 .toggle-label{font-size:15px;font-weight:500;color:#000}
@@ -209,12 +192,6 @@ body{font-family:'Inter',sans-serif;background:#f2f2f7;color:#000;min-height:100
 .toggle-track::after{content:'';position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:transform .2s}
 input:checked+.toggle-track{background:#34c759}
 input:checked+.toggle-track::after{transform:translateX(20px)}
-/* ── DATE / TIME / ADDRESS / UPLOAD ── */
-.time-row{display:grid;grid-template-columns:1fr 22px 1fr;gap:8px;align-items:center}
-.time-sep{font-size:20px;color:rgba(0,0,0,.25);text-align:center;padding-top:9px}
-.recurring-row{display:flex;align-items:center;gap:8px;margin-top:10px;cursor:pointer}
-.recurring-row input{width:16px;height:16px;cursor:pointer;accent-color:#000}
-.recurring-row span{font-size:14px;font-weight:500;color:rgba(0,0,0,.55)}
 .addr-wrap{position:relative}
 .addr-spinner{position:absolute;right:14px;top:13px;width:18px;height:18px;border:2px solid rgba(0,0,0,.12);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -237,402 +214,289 @@ input:checked+.toggle-track::after{transform:translateX(20px)}
 .upload-preview-img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:14px;display:block;background:#eee;margin-bottom:10px}
 .upload-btns{display:flex;gap:8px;margin-bottom:10px}
 .upload-btn{flex:1;padding:10px;border-radius:10px;background:rgba(0,0,0,.07);border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
-.upload-btn:hover{background:rgba(0,0,0,.12)}
 .upload-url-row{display:flex;gap:8px;align-items:center}
 .upload-url-row input{flex:1;border:1.5px solid rgba(0,0,0,.1);border-radius:10px;padding:10px 12px;font-family:'Inter',sans-serif;font-size:14px;outline:none;background:#fafafa}
 .upload-url-row input:focus{border-color:#000;background:#fff}
 .upload-url-btn{padding:10px 16px;border-radius:10px;background:#000;border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#fff;cursor:pointer;white-space:nowrap}
-/* Form footer */
 .form-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:28px}
-
-/* ── PREVIEW CARD ── */
-.preview-wrap{position:sticky;top:24px}
-.preview-label{font-size:12px;font-weight:600;color:rgba(0,0,0,.4);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
-.preview-phone{
-  width:100%;max-width:320px;border-radius:28px;overflow:hidden;
-  box-shadow:0 16px 48px rgba(0,0,0,.18);background:#f6f6f6;
-  border:8px solid #111;
-}
-.preview-img{width:100%;height:130px;object-fit:cover;background:#e0e0e0;display:block}
-.preview-body{padding:14px}
-.preview-cat{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:40px;font-size:11px;font-weight:600;margin-bottom:8px}
-.preview-name{font-size:18px;font-weight:700;color:#000;line-height:1.2;margin-bottom:4px}
-.preview-desc{font-size:13px;color:rgba(0,0,0,.6);margin-bottom:12px}
-.preview-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:12px}
-.preview-stat{background:rgba(0,0,0,.05);border-radius:8px;padding:8px;text-align:center;font-size:11px;font-weight:600;color:#000}
-.preview-btns{display:flex;gap:6px}
-.preview-btn-g{flex:1;padding:11px 8px;border-radius:50px;background:rgba(0,0,0,.08);font-size:12px;font-weight:600;text-align:center;color:#000}
-.preview-btn-b{flex:1;padding:11px 8px;border-radius:50px;background:#000;font-size:12px;font-weight:600;text-align:center;color:#fff}
-
-/* ── MOBILE TOPBAR (mobile only) ── */
-.mobile-bar{display:none;align-items:center;justify-content:space-between;padding:16px;background:#fff;border-bottom:.5px solid rgba(0,0,0,.08);position:sticky;top:0;z-index:100}
-@media(max-width:767px){
-  .mobile-bar{display:flex}
-  #sidebar{display:none}
-  #main{padding:16px}
-  .form-grid{grid-template-columns:1fr}
-  .stats-grid{grid-template-columns:1fr 1fr}
-}
-
-/* ── EMPTY STATE ── */
-.empty{text-align:center;padding:60px 24px;color:rgba(0,0,0,.35)}
-.empty-icon{font-size:48px;margin-bottom:12px}
-.empty-text{font-size:15px;font-weight:500}
+.btn-form-ghost{padding:14px 20px;border-radius:56px;background:rgba(0,0,0,.08);border:none;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:#000;cursor:pointer}
+.btn-form-primary{padding:14px 24px;border-radius:56px;background:#000;border:none;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px}
+.recurring-row{display:flex;align-items:center;gap:8px;margin-top:10px;cursor:pointer}
+.recurring-row input{width:16px;height:16px;cursor:pointer;accent-color:#000}
+.recurring-row span{font-size:14px;font-weight:500;color:rgba(0,0,0,.55)}
 
 /* ── TOAST ── */
-#toast{
-  position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);
-  background:#000;color:#fff;padding:12px 24px;border-radius:40px;
-  font-size:14px;font-weight:500;z-index:9999;
-  transition:transform .3s cubic-bezier(.32,.94,.6,1);pointer-events:none;
-  white-space:nowrap;
-}
+#toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);background:#000;color:#fff;padding:12px 24px;border-radius:40px;font-size:14px;font-weight:500;z-index:9999;transition:transform .3s cubic-bezier(.32,.94,.6,1);pointer-events:none;white-space:nowrap}
 #toast.show{transform:translateX(-50%) translateY(0)}
 
-/* ── DELETE CONFIRM ── */
+/* ── CONFIRM ── */
 #confirmOverlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:2000;display:none;align-items:center;justify-content:center}
 #confirmOverlay.show{display:flex}
 .confirm-box{background:#fff;border-radius:20px;padding:28px;width:min(360px,90vw);text-align:center}
 .confirm-title{font-size:18px;font-weight:700;margin-bottom:8px}
 .confirm-sub{font-size:14px;color:rgba(0,0,0,.5);margin-bottom:24px}
 .confirm-btns{display:flex;gap:8px}
+.btn-danger{display:inline-flex;align-items:center;gap:6px;padding:12px 20px;border-radius:10px;background:rgba(255,59,48,.1);border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#ff3b30;cursor:pointer;flex:1;justify-content:center}
+.btn-danger:hover{background:rgba(255,59,48,.18)}
+
+/* Mobile fallback */
+@media(max-width:767px){
+  #mapArea{display:none}
+  #content{flex:1;padding:16px}
+  #body{overflow-y:auto}
+}
 </style>
 </head>
 <body>
 
-<!-- ── LOGIN ── -->
+<!-- LOGIN -->
 <div id="loginScreen">
   <div class="login-box">
     <div class="login-logo">
-      <div class="login-logo-mark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
-      </div>
+      <svg class="login-logo-img" viewBox="0 0 37 50" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="37" height="50" rx="4" fill="#e8a020"/><text x="18.5" y="36" text-anchor="middle" font-size="28" fill="#cc2200">🏰</text></svg>
       <div>
         <div class="login-logo-text">Huddinge Karta</div>
-        <div class="login-logo-sub">Aktörsportal</div>
+        <div class="login-logo-sub">Adminportal</div>
       </div>
     </div>
-    <div class="login-title">Logga in</div>
-    <div class="login-sub">Hantera ditt innehåll i Huddinge Karta</div>
-    <div class="field">
+    <div class="login-title">Logga In</div>
+    <div class="login-subtitle">Hantera ditt innehåll i Huddinge Karta</div>
+    <div class="login-field">
       <label>Användarnamn</label>
-      <input type="text" id="loginUser" placeholder="admin" autocomplete="username">
+      <input type="text" id="loginUser" placeholder="Admin" autocomplete="username">
     </div>
-    <div class="field">
+    <div class="login-field">
       <label>Lösenord</label>
-      <input type="password" id="loginPass" placeholder="••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      <input type="password" id="loginPass" placeholder="****" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <button class="login-btn" onclick="doLogin()">Logga in</button>
     <div class="login-err" id="loginErr">Felaktigt användarnamn eller lösenord</div>
   </div>
 </div>
 
-<!-- ── APP ── -->
+<!-- APP -->
 <div id="app">
-  <!-- Mobile bar -->
-  <div class="mobile-bar">
-    <div class="sidebar-logo">
-      <div class="sidebar-logo-mark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
-      </div>
-      <div><div class="sidebar-logo-text">Huddinge Admin</div></div>
-    </div>
-    <button onclick="showPage('list')" style="background:none;border:none;font-size:14px;font-weight:600;cursor:pointer">← Lista</button>
-  </div>
-
-  <!-- Sidebar -->
-  <div id="sidebar">
-    <div class="sidebar-head">
-      <div class="sidebar-logo">
-        <div class="sidebar-logo-mark">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
-        </div>
-        <div>
-          <div class="sidebar-logo-text">Huddinge Karta</div>
-          <div class="sidebar-logo-sub">Aktörsportal</div>
-        </div>
+  <!-- Top bar -->
+  <div id="topBar">
+    <div class="tb-logo">
+      <svg class="tb-logo-img" viewBox="0 0 37 50" fill="none"><rect width="37" height="50" rx="4" fill="#e8a020"/><text x="18.5" y="36" text-anchor="middle" font-size="28" fill="#cc2200">🏰</text></svg>
+      <div>
+        <div class="tb-logo-name">Huddinge Karta</div>
+        <div class="tb-logo-sub">Adminportal</div>
       </div>
     </div>
-    <div class="sidebar-nav">
-      <div class="nav-section-title">Innehåll</div>
-      <div class="nav-item active" id="navList" onclick="showPage('list')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
-        Alla inlägg
-        <span class="nav-count" id="navCount">0</span>
-      </div>
-      <div class="nav-item" id="navAdd" onclick="newItem()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
-        Lägg till nytt
-      </div>
-      <div class="nav-section-title">Kategorier</div>
-      <div class="nav-item" onclick="filterNav('event')">
-        <span style="width:10px;height:10px;border-radius:50%;background:var(--event);flex-shrink:0;display:inline-block"></span>
-        Event
-      </div>
-      <div class="nav-item" onclick="filterNav('konst')">
-        <span style="width:10px;height:10px;border-radius:50%;background:var(--konst);flex-shrink:0;display:inline-block"></span>
-        Konst
-      </div>
-      <div class="nav-item" onclick="filterNav('motes')">
-        <span style="width:10px;height:10px;border-radius:50%;background:var(--motes);flex-shrink:0;display:inline-block"></span>
-        Mötesplats
-      </div>
-      <div class="nav-item" onclick="filterNav('musik')">
-        <span style="width:10px;height:10px;border-radius:50%;background:var(--musik);flex-shrink:0;display:inline-block"></span>
-        Musik
-      </div>
-    </div>
-    <div class="sidebar-foot">
-      <button class="logout-btn" onclick="doLogout()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-        Logga ut (admin)
+    <div class="tb-actions">
+      <button class="btn-ghost-tb" onclick="window.open('index.html','_blank')">
+        Se kulturkartan
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg>
+      </button>
+      <button class="btn-primary-tb" onclick="newItem()">
+        Skapa event
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
       </button>
     </div>
   </div>
 
-  <!-- Main -->
-  <div id="main">
+  <!-- Body -->
+  <div id="body">
+    <!-- Content -->
+    <div id="content">
 
-    <!-- LIST PAGE -->
-    <div class="page active" id="pagelist">
-      <div class="page-head">
-        <div>
-          <div class="page-title">Alla inlägg</div>
-          <div class="page-sub" id="listSub">Laddar...</div>
+      <!-- LIST PAGE -->
+      <div class="page active" id="pagelist">
+        <div class="list-title">Alla inlägg</div>
+        <div class="list-sub" id="listSub">Laddar...</div>
+        <div class="cat-chips-row" id="catChipsRow"></div>
+        <div class="items-list" id="itemsGrid"></div>
+      </div>
+
+      <!-- FORM PAGE -->
+      <div class="page" id="pageform">
+        <div class="form-back" onclick="showPage('list')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M5 12l7 7M5 12l7-7"/></svg>
+          Tillbaka till listan
         </div>
-        <button class="btn-primary" onclick="newItem()">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M8 2v12M2 8h12"/></svg>
-          Lägg till nytt
-        </button>
+        <div class="form-page-title" id="formTitle">Nytt inlägg</div>
+        <div class="form-page-sub">Fyll i informationen nedan</div>
+
+        <!-- Grundinfo -->
+        <div class="form-card">
+          <div class="form-card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Grundinformation
+          </div>
+          <div class="form-field">
+            <label class="form-label">Namn *</label>
+            <input class="form-input" type="text" id="fName" placeholder="T.ex. Flemingsberg Tour">
+          </div>
+          <div class="form-field">
+            <label class="form-label">Kort beskrivning *</label>
+            <input class="form-input" type="text" id="fDesc" placeholder="En rad om evenemanget" maxlength="80">
+            <div class="form-hint">Visas under titeln. Max 80 tecken.</div>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Lång beskrivning</label>
+            <textarea class="form-textarea" id="fLongDesc" placeholder="Beskriv evenemanget mer utförligt..."></textarea>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Kategori *</label>
+            <div class="cat-pills">
+              <button class="cat-pill" data-cat="samhalle" onclick="selectCatForm('samhalle')">Samhälle</button>
+              <button class="cat-pill" data-cat="kurs" onclick="selectCatForm('kurs')">Kurs</button>
+              <button class="cat-pill" data-cat="konst" onclick="selectCatForm('konst')">Konst</button>
+              <button class="cat-pill" data-cat="musik" onclick="selectCatForm('musik')">Musik</button>
+              <button class="cat-pill" data-cat="fritid" onclick="selectCatForm('fritid')">Fritid</button>
+              <button class="cat-pill" data-cat="spel" onclick="selectCatForm('spel')">Spel</button>
+              <button class="cat-pill" data-cat="teater" onclick="selectCatForm('teater')">Teater</button>
+              <button class="cat-pill" data-cat="hantverk" onclick="selectCatForm('hantverk')">Hantverk</button>
+              <button class="cat-pill" data-cat="film" onclick="selectCatForm('film')">Film</button>
+            </div>
+            <input type="hidden" id="fCat">
+          </div>
+        </div>
+
+        <!-- Tid & Plats -->
+        <div class="form-card">
+          <div class="form-card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            Tid & Plats
+          </div>
+          <div class="form-field">
+            <label class="form-label">Datum</label>
+            <input class="form-input" type="date" id="fDate" oninput="updatePreview()">
+            <label class="recurring-row">
+              <input type="checkbox" id="fRecurring" onchange="toggleRecurring()">
+              <span>Löpande / Permanent</span>
+            </label>
+            <input type="hidden" id="fDateText">
+          </div>
+          <div class="form-field" id="timeField">
+            <label class="form-label">Tid</label>
+            <div class="time-row">
+              <input class="form-input" type="time" id="fTimeStart">
+              <div class="time-sep">–</div>
+              <input class="form-input" type="time" id="fTimeEnd">
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Sök plats / adress</label>
+            <div class="addr-wrap">
+              <input class="form-input" type="text" id="fAddrSearch" placeholder="T.ex. Flemingsberg bibliotek" autocomplete="off" oninput="onAddrInput()" onfocus="onAddrInput()">
+              <div class="addr-spinner" id="addrSpinner"></div>
+              <div class="addr-dropdown" id="addrDropdown"></div>
+            </div>
+            <div class="addr-selected" id="addrSelected">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
+              <span id="addrSelectedText"></span>
+              <button class="addr-clear" onclick="clearAddr()">×</button>
+            </div>
+            <div class="addr-coords" id="addrCoords"></div>
+            <input type="hidden" id="fLoc">
+            <input type="hidden" id="fAddr">
+            <input type="hidden" id="fLat">
+            <input type="hidden" id="fLng">
+          </div>
+          <div class="form-field">
+            <label class="form-label">Område</label>
+            <select class="form-select" id="fArea">
+              <option value="">Välj område</option>
+              <option value="flemingsberg">Flemingsberg</option>
+              <option value="huddinge">Huddinge</option>
+              <option value="skogas">Skogås</option>
+              <option value="sjodalen">Sjödalen</option>
+              <option value="glomsta">Glömsta</option>
+              <option value="vistaberg">Vistaberg</option>
+              <option value="lida">Lida</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Organisatör -->
+        <div class="form-card">
+          <div class="form-card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Organisatör
+          </div>
+          <div class="form-field">
+            <label class="form-label">Organisatör</label>
+            <select class="form-select" id="fHost">
+              <option value="">Välj organisatör</option>
+              <option>ABF</option>
+              <option>Huddinge Kommun</option>
+              <option>KTH</option>
+              <option>Naturskyddsföreningen</option>
+              <option>Stadsbiblioteket</option>
+              <option>Huddinge Musikskola</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Extern länk</label>
+            <input class="form-input" type="url" id="fUrl" placeholder="https://www.abf.se/evenemang/...">
+          </div>
+        </div>
+
+        <!-- Bild -->
+        <div class="form-card">
+          <div class="form-card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            Bild
+          </div>
+          <div class="form-field">
+            <div id="imgPreviewArea" style="display:none">
+              <img class="upload-preview-img" id="imgPreviewEl" src="" alt="">
+              <div class="upload-btns">
+                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Byt bild</button>
+                <button class="upload-btn" onclick="clearImage()" style="color:#ff3b30">Ta bort</button>
+              </div>
+            </div>
+            <div class="upload-zone" id="uploadZone">
+              <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+              <div class="upload-zone-title">Dra och släpp bild här</div>
+              <div class="upload-zone-sub">eller klicka · JPG, PNG, WEBP</div>
+            </div>
+            <div style="margin-top:12px">
+              <div class="form-hint" style="margin-bottom:6px">Eller klistra in bild-URL:</div>
+              <div class="upload-url-row">
+                <input type="url" id="fImgUrl" placeholder="https://images.unsplash.com/...">
+                <button class="upload-url-btn" onclick="loadImgFromUrl()">Hämta</button>
+              </div>
+            </div>
+            <input type="hidden" id="fImg">
+          </div>
+        </div>
+
+        <!-- Inställningar -->
+        <div class="form-card">
+          <div class="form-card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Inställningar
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Gratis</div>
+              <div class="toggle-sub">Visas med grönt Gratis-märke</div>
+            </div>
+            <label class="toggle-sw"><input type="checkbox" id="fFree"><span class="toggle-track"></span></label>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <button class="btn-form-ghost" onclick="showPage('list')">Avbryt</button>
+          <button class="btn-form-primary" onclick="saveItem()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M13 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V5l-3-3z"/><path d="M10 2v3H5M8 12V8"/></svg>
+            Spara inlägg
+          </button>
+        </div>
       </div>
 
-      <!-- Stats -->
-      <div class="stats-grid" id="statsGrid"></div>
+    </div><!-- #content -->
 
-      <!-- Filter bar -->
-      <div class="filter-bar">
-        <input class="search-box" type="text" placeholder="Sök på namn eller plats..." oninput="renderList(this.value)">
-        <button class="filter-pill" id="fpAll" onclick="filterNav(null)">Alla</button>
-        <button class="filter-pill" onclick="filterNav('event')" style="color:var(--event)">Event</button>
-        <button class="filter-pill" onclick="filterNav('konst')" style="color:var(--konst)">Konst</button>
-        <button class="filter-pill" onclick="filterNav('motes')" style="color:var(--motes)">Mötesplats</button>
-        <button class="filter-pill" onclick="filterNav('musik')" style="color:var(--musik)">Musik</button>
-      </div>
-
-      <div class="items-grid" id="itemsGrid"></div>
+    <!-- Map -->
+    <div id="mapArea">
+      <div id="adminMap"></div>
     </div>
-
-    <!-- FORM PAGE (add/edit) -->
-    <div class="page" id="pageform">
-      <div class="form-back" onclick="showPage('list')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M5 12l7 7M5 12l7-7"/></svg>
-        Tillbaka till listan
-      </div>
-      <div class="page-head">
-        <div>
-          <div class="page-title" id="formTitle">Nytt inlägg</div>
-          <div class="page-sub">Fyll i informationen nedan</div>
-        </div>
-      </div>
-
-      <div class="form-grid">
-        <!-- LEFT COLUMN -->
-        <div>
-          <!-- Grundinfo -->
-          <div class="form-card" style="margin-bottom:20px">
-            <div class="form-card-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              Grundinformation
-            </div>
-            <div class="form-field">
-              <label class="form-label">Namn *</label>
-              <input class="form-input" type="text" id="fName" placeholder="T.ex. Flemingsberg Tour">
-            </div>
-            <div class="form-field">
-              <label class="form-label">Kort beskrivning *</label>
-              <input class="form-input" type="text" id="fDesc" placeholder="En rad om evenemanget" maxlength="80">
-              <div class="form-hint">Visas under titeln i kartvy. Max 80 tecken.</div>
-            </div>
-            <div class="form-field">
-              <label class="form-label">Lång beskrivning</label>
-              <textarea class="form-textarea" id="fLongDesc" placeholder="Beskriv evenemanget mer utförligt..."></textarea>
-            </div>
-            <div class="form-field">
-              <label class="form-label">Kategori *</label>
-              <div class="cat-pills">
-                <button class="cat-pill" data-cat="event" onclick="selectCatForm('event')">Event</button>
-                <button class="cat-pill" data-cat="konst" onclick="selectCatForm('konst')">Konst</button>
-                <button class="cat-pill" data-cat="motes" onclick="selectCatForm('motes')">Mötesplats</button>
-                <button class="cat-pill" data-cat="musik" onclick="selectCatForm('musik')">Musik</button>
-              </div>
-              <input type="hidden" id="fCat">
-            </div>
-          </div>
-
-          <!-- Tid & Plats -->
-          <div class="form-card" style="margin-bottom:20px">
-            <div class="form-card-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-              Tid & Plats
-            </div>
-            <div class="form-field">
-              <label class="form-label">Datum</label>
-              <input class="form-input" type="date" id="fDate" oninput="updatePreview()">
-              <label class="recurring-row">
-                <input type="checkbox" id="fRecurring" onchange="toggleRecurring()">
-                <span>Löpande / Permanent (inget specifikt datum)</span>
-              </label>
-              <input type="hidden" id="fDateText">
-            </div>
-            <div class="form-field" id="timeField">
-              <label class="form-label">Tid</label>
-              <div class="time-row">
-                <input class="form-input" type="time" id="fTimeStart" oninput="updatePreview()">
-                <div class="time-sep">–</div>
-                <input class="form-input" type="time" id="fTimeEnd" oninput="updatePreview()">
-              </div>
-            </div>
-            <div class="form-field">
-              <label class="form-label">Sök plats / adress</label>
-              <div class="addr-wrap">
-                <input class="form-input" type="text" id="fAddrSearch" placeholder="T.ex. Flemingsberg bibliotek, Huddinge" autocomplete="off" oninput="onAddrInput()" onfocus="onAddrInput()">
-                <div class="addr-spinner" id="addrSpinner"></div>
-                <div class="addr-dropdown" id="addrDropdown"></div>
-              </div>
-              <div class="addr-selected" id="addrSelected">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
-                <span id="addrSelectedText"></span>
-                <button class="addr-clear" onclick="clearAddr()">×</button>
-              </div>
-              <div class="addr-coords" id="addrCoords"></div>
-              <input type="hidden" id="fLoc">
-              <input type="hidden" id="fAddr">
-              <input type="hidden" id="fLat">
-              <input type="hidden" id="fLng">
-            </div>
-            <div class="form-field">
-              <label class="form-label">Område (filter)</label>
-              <select class="form-select" id="fArea">
-                <option value="">Välj område</option>
-                <option value="flemingsberg">Flemingsberg</option>
-                <option value="huddinge">Huddinge</option>
-                <option value="skogas">Skogås</option>
-                <option value="sjodalen">Sjödalen</option>
-                <option value="glomsta">Glömsta</option>
-                <option value="vistaberg">Vistaberg</option>
-                <option value="lida">Lida</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Organisatör & Länk -->
-          <div class="form-card" style="margin-bottom:20px">
-            <div class="form-card-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              Organisatör
-            </div>
-            <div class="form-field">
-              <label class="form-label">Organisatör (filter)</label>
-              <select class="form-select" id="fHost">
-                <option value="">Välj organisatör</option>
-                <option>ABF</option>
-                <option>Huddinge Kommun</option>
-                <option>KTH</option>
-                <option>Naturskyddsföreningen</option>
-                <option>Stadsbiblioteket</option>
-                <option>Huddinge Musikskola</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label class="form-label">Extern länk (för "Ansök att gå med")</label>
-              <input class="form-input" type="url" id="fUrl" placeholder="https://www.abf.se/evenemang/...">
-              <div class="form-hint">Öppnas i Safari när användaren trycker "Ansök att gå med".</div>
-            </div>
-          </div>
-
-          <!-- Bild -->
-          <div class="form-card" style="margin-bottom:20px">
-            <div class="form-card-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-              Bild
-            </div>
-            <div class="form-field">
-              <!-- Preview (hidden until image set) -->
-              <div id="imgPreviewArea" style="display:none">
-                <img class="upload-preview-img" id="imgPreviewEl" src="" alt="">
-                <div class="upload-btns">
-                  <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Byt bild från dator</button>
-                  <button class="upload-btn" onclick="clearImage()" style="color:#ff3b30">Ta bort</button>
-                </div>
-              </div>
-              <!-- Drop zone (shown when no image) -->
-              <div class="upload-zone" id="uploadZone">
-                <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-                <div class="upload-zone-title">Dra och släpp bild här</div>
-                <div class="upload-zone-sub">eller klicka för att välja från datorn · JPG, PNG, WEBP</div>
-              </div>
-              <!-- URL fallback -->
-              <div style="margin-top:12px">
-                <div class="form-hint" style="margin-bottom:6px">Eller klistra in en bild-URL direkt:</div>
-                <div class="upload-url-row">
-                  <input type="url" id="fImgUrl" placeholder="https://images.unsplash.com/...">
-                  <button class="upload-url-btn" onclick="loadImgFromUrl()">Hämta</button>
-                </div>
-              </div>
-              <input type="hidden" id="fImg">
-            </div>
-          </div>
-
-          <!-- Inställningar -->
-          <div class="form-card" style="margin-bottom:20px">
-            <div class="form-card-title">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-              Inställningar
-            </div>
-            <div class="toggle-row">
-              <div>
-                <div class="toggle-label">Gratis</div>
-                <div class="toggle-sub">Visas med grönt "Gratis"-märke i appen</div>
-              </div>
-              <label class="toggle-sw"><input type="checkbox" id="fFree"><span class="toggle-track"></span></label>
-            </div>
-          </div>
-
-          <div class="form-footer">
-            <button class="btn-ghost" onclick="showPage('list')">Avbryt</button>
-            <button class="btn-primary" onclick="saveItem()">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M13 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V5l-3-3z"/><path d="M10 2v3H5M8 12V8"/></svg>
-              Spara inlägg
-            </button>
-          </div>
-        </div>
-
-        <!-- RIGHT: PREVIEW -->
-        <div class="preview-wrap">
-          <div class="preview-label">Förhandsvisning i appen</div>
-          <div class="preview-phone">
-            <img id="pvImg" class="preview-img" src="" alt="">
-            <div class="preview-body">
-              <div id="pvCat" class="preview-cat" style="background:rgba(0,0,0,.08);color:rgba(0,0,0,.5)">Kategori</div>
-              <div id="pvName" class="preview-name" style="color:rgba(0,0,0,.3)">Namn på inlägg</div>
-              <div id="pvDesc" class="preview-desc">Kort beskrivning visas här</div>
-              <div class="preview-stats">
-                <div class="preview-stat" id="pvDate">Datum</div>
-                <div class="preview-stat" id="pvLoc">Plats</div>
-                <div class="preview-stat" id="pvTime">Tid</div>
-              </div>
-              <div class="preview-btns">
-                <div class="preview-btn-g">Hitta hit</div>
-                <div class="preview-btn-b">Ansök att gå med</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- #main -->
+  </div><!-- #body -->
 </div><!-- #app -->
 
 <div id="toast"></div>
@@ -641,208 +505,207 @@ input:checked+.toggle-track::after{transform:translateX(20px)}
     <div class="confirm-title">Ta bort inlägg?</div>
     <div class="confirm-sub" id="confirmSub">Åtgärden kan inte ångras.</div>
     <div class="confirm-btns">
-      <button class="btn-ghost" style="flex:1" onclick="closeConfirm()">Avbryt</button>
-      <button class="btn-danger" style="flex:1;justify-content:center" id="confirmOk">Ta bort</button>
+      <button class="btn-form-ghost" onclick="closeConfirm()">Avbryt</button>
+      <button class="btn-danger" id="confirmOk">Ta bort</button>
     </div>
   </div>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// ── DATA (seeded from main app) ────────────────────────────────────
-const SEED=[
-  {id:1,cat:'event',name:'Flemingsberg Tour',desc:'En guideresa genom hela centrum',longDesc:'Upplev Flemingsberg på ett nytt sätt med denna guidade stadsrunda.',date:'12 Jun',time:'12:00–14:00',loc:'Flemingsbergs C',addr:'Sankt Åkes väg 24',area:'flemingsberg',host:'ABF',free:false,url:'https://www.abf.se',img:'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600&q=80',lat:59.2178,lng:17.9465},
-  {id:2,cat:'event',name:'Kulturkvällen',desc:'Konst, mat och musik i parken',longDesc:'En kväll fylld av konst, lokal mat och livemusik under bar himmel.',date:'14 Jun',time:'17:00–21:00',loc:'Huddinge Centrum',addr:'Kommunalvägen 28',area:'huddinge',host:'Huddinge Kommun',free:true,url:'https://www.huddinge.se',img:'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80',lat:59.2358,lng:17.9832},
-  {id:3,cat:'event',name:'Naturvandring',desc:'Guidad tur i Lida naturreservat',longDesc:'Vandring i ett av södra Stockholms vackraste naturreservat.',date:'15 Jun',time:'09:00–13:00',loc:'Lida',addr:'Lida Naturreservat',area:'lida',host:'Naturskyddsföreningen',free:true,url:'https://www.naturskyddsforeningen.se',img:'https://images.unsplash.com/photo-1476820865390-c52aeebb9891?w=600&q=80',lat:59.1905,lng:17.8730},
-  {id:4,cat:'event',name:'Familjedag',desc:'Aktiviteter för hela familjen',longDesc:'En härlig familjedag med lekar, hantverk och aktiviteter för alla åldrar.',date:'21 Jun',time:'11:00–16:00',loc:'Sjödalen',addr:'Sjödalens Gård 1',area:'sjodalen',host:'Huddinge Kommun',free:true,url:'https://www.huddinge.se',img:'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&q=80',lat:59.2680,lng:18.0120},
-  {id:5,cat:'konst',name:'KTH Utställning',desc:'Studentkonst och design',longDesc:'Studenternas bästa arbeten visas upp i KTHs öppna galleriyta.',date:'10–30 Jun',time:'10:00–18:00',loc:'KTH Flemingsberg',addr:'Hälsovägen 11',area:'flemingsberg',host:'KTH',free:false,url:'https://www.kth.se',img:'https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=600&q=80',lat:59.2205,lng:17.9388},
-  {id:6,cat:'konst',name:'Glömsta Galleri',desc:'Lokal konst och hantverk',longDesc:'En intim gallerupplevelse med lokala konstnärer.',date:'Löpande',time:'11:00–17:00',loc:'Glömsta',addr:'Glömstavägen 5',area:'glomsta',host:'Huddinge Kommun',free:false,url:'https://www.huddinge.se/kultur',img:'https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=600&q=80',lat:59.2562,lng:17.9124},
-  {id:7,cat:'konst',name:'Outdoor Murals',desc:'Gatukonst i Skogås',longDesc:'En promenadtur bland stora väggmålningar.',date:'Permanent',time:'Dygnet runt',loc:'Skogås',addr:'Skogåsvägen 12',area:'skogas',host:'Huddinge Kommun',free:true,url:'https://www.huddinge.se/kultur',img:'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&q=80',lat:59.1998,lng:18.0352},
-  {id:8,cat:'motes',name:'ABF Huddinge',desc:'Mötesplats för alla åldrar',longDesc:'ABF erbjuder kurser, föreläsningar och mötesplatser för alla åldrar.',date:'Mån–Fre',time:'09:00–17:00',loc:'Huddinge Centrum',addr:'Kommunalvägen 32',area:'huddinge',host:'ABF',free:false,url:'https://www.abf.se',img:'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80',lat:59.2389,lng:17.9801},
-  {id:9,cat:'motes',name:'Flemingsberg Bibliotek',desc:'Böcker, internet och studiero',longDesc:'Flemingsbergs bibliotek erbjuder böcker, tidningar och internet.',date:'Löpande',time:'10:00–19:00',loc:'Flemingsbergs C',addr:'Biblioteksvägen 1',area:'flemingsberg',host:'Stadsbiblioteket',free:true,url:'https://bibliotek.huddinge.se',img:'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=600&q=80',lat:59.2192,lng:17.9450},
-  {id:10,cat:'motes',name:'Sjödalen Gård',desc:'Historisk gård och mötesplats',longDesc:'Historisk gård från 1700-talet, nu mötesplats för hembygdsföreningen.',date:'Löpande',time:'10:00–16:00',loc:'Sjödalen',addr:'Sjödalsvägen 3',area:'sjodalen',host:'Huddinge Kommun',free:true,url:'https://www.huddinge.se/kultur',img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80',lat:59.2680,lng:18.0050},
-  {id:11,cat:'musik',name:'Jazz i parken',desc:'Sommarjazz under öppen himmel',longDesc:'Årets stora utomhuskonsert med lokala jazzmusiker.',date:'20 Jun',time:'18:00–21:00',loc:'Stortorget',addr:'Stortorget 1',area:'huddinge',host:'Huddinge Kommun',free:true,url:'https://www.huddinge.se/kultur',img:'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=600&q=80',lat:59.2410,lng:17.9870},
-  {id:12,cat:'musik',name:'Sommarkonsert',desc:'Klassisk musik i Vistabergs kyrka',longDesc:'En klassisk konsert med stycken av Mozart, Haydn och Beethoven.',date:'28 Jun',time:'19:00–21:30',loc:'Vistabergs Kyrka',addr:'Kyrkovägen 5',area:'vistaberg',host:'Huddinge Musikskola',free:false,url:'https://www.huddinge.se/kultur',img:'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=600&q=80',lat:59.1845,lng:17.9650},
-  {id:13,cat:'musik',name:'Trubadur på Torget',desc:'Folkmusik och visor',longDesc:'Elever och lärare framför folkmusik och svenska visor på torget.',date:'22 Jun',time:'14:00–16:00',loc:'Huddinge Torg',addr:'Huddinge Torg 2',area:'huddinge',host:'Huddinge Musikskola',free:true,url:'https://www.huddinge.se/kultur',img:'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&q=80',lat:59.2367,lng:17.9811},
-];
+const CAT_COLOR={musik:'#3d8700',konst:'#008296',teater:'#c0136f',samhalle:'#666cd8',fritid:'#be5a00',spel:'#6e19bb',hantverk:'#8f3c00',film:'#260096',kurs:'#4781ce'};
+const CAT_BG={musik:'rgba(139,183,102,.2)',konst:'rgba(102,180,192,.2)',teater:'rgba(223,140,189,.2)',samhalle:'rgba(102,108,216,.2)',fritid:'rgba(216,156,102,.2)',spel:'rgba(142,21,255,.2)',hantverk:'rgba(187,79,7,.2)',film:'rgba(38,0,150,.2)',kurs:'rgba(71,129,206,.2)'};
+const CAT_LABEL={musik:'Musik',konst:'Konst',teater:'Teater',samhalle:'Samhälle',fritid:'Fritid',spel:'Spel',hantverk:'Hantverk',film:'Film',kurs:'Kurs'};
+const CAT_ORDER=['samhalle','kurs','konst','musik','fritid','spel','teater','hantverk','film'];
 
-const CAT_COLOR={event:'#bf5917',konst:'#068a99',motes:'#c0136f',musik:'#c3a523'};
-const CAT_BG={event:'rgba(209,96,23,.12)',konst:'rgba(71,193,206,.12)',motes:'rgba(209,66,142,.12)',musik:'rgba(248,216,75,.2)'};
-const CAT_LABEL={event:'Event',konst:'Konst',motes:'Mötesplats',musik:'Musik'};
-const AREA_LABEL={flemingsberg:'Flemingsberg',huddinge:'Huddinge',skogas:'Skogås',sjodalen:'Sjödalen',glomsta:'Glömsta',vistaberg:'Vistaberg',lida:'Lida'};
+// Category SVG icons (inline, same as main app)
+const CAT_ICONS={
+  musik:`<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M6.748 13.876C6.748 13.377 6.21 12.751 5.248 12.751C4.286 12.751 3.748 13.377 3.748 13.876C3.749 14.375 4.286 15.001 5.248 15.001C6.21 15.001 6.748 14.375 6.748 13.876ZM14.248 11.626C14.248 11.127 13.711 10.501 12.748 10.501C11.786 10.501 11.248 11.127 11.248 11.626C11.249 12.125 11.786 12.751 12.748 12.751C13.71 12.751 14.248 12.125 14.248 11.626ZM15.744 11.771C15.656 13.262 14.224 14.251 12.748 14.251C11.225 14.251 9.749 13.197 9.748 11.626C9.748 10.054 11.225 9.001 12.748 9.001C13.274 9.001 13.793 9.128 14.248 9.357V4.266C14.248 3.764 13.764 3.403 13.283 3.548L8.782 4.898C8.466 4.993 8.248 5.285 8.248 5.616V13.876L8.244 14.021C8.156 15.512 6.724 16.501 5.248 16.501C3.725 16.501 2.249 15.447 2.248 13.876C2.248 12.304 3.725 11.251 5.248 11.251C5.774 11.251 6.293 11.378 6.748 11.607V5.616C6.748 4.622 7.4 3.747 8.352 3.462L12.852 2.111C14.295 1.678 15.748 2.759 15.748 4.266V11.626L15.744 11.771Z" fill="currentColor"/></svg>`,
+  konst:`<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 9C15 5.933 12.355 3.375 9 3.375C5.645 3.375 3 5.933 3 9C3 12.024 5.573 14.552 8.861 14.621C8.859 14.618 8.857 14.613 8.855 14.609C8.696 14.318 8.429 13.866 8.271 13.4C8.108 12.917 8.017 12.29 8.329 11.665C8.825 10.674 9.778 10.478 10.576 10.489C10.977 10.495 11.394 10.551 11.783 10.612C12.192 10.677 12.553 10.744 12.925 10.792C13.695 10.892 14.178 10.858 14.469 10.677C14.685 10.542 15 10.184 15 9ZM5.74 8.068C6.307 8.126 6.75 8.605 6.75 9.188C6.75 9.809 6.246 10.313 5.625 10.313C5.043 10.313 4.564 9.87 4.506 9.303L4.5 9.188L4.506 9.072C4.564 8.505 5.043 8.063 5.625 8.063L5.74 8.068ZM11.74 6.006C12.307 6.064 12.75 6.543 12.75 7.125C12.75 7.746 12.246 8.25 11.625 8.25C11.043 8.25 10.564 7.807 10.506 7.24L10.5 7.125L10.506 7.01C10.564 6.443 11.043 6 11.625 6L11.74 6.006ZM7.99 4.881C8.557 4.939 9 5.418 9 6C9 6.621 8.496 7.125 7.875 7.125C7.293 7.125 6.814 6.682 6.756 6.115L6.75 6L6.756 5.885C6.814 5.318 7.293 4.875 7.875 4.875L7.99 4.881ZM16.5 9C16.5 10.406 16.122 11.415 15.262 11.95C14.476 12.439 13.498 12.379 12.731 12.279C12.336 12.228 11.909 12.151 11.551 12.095C11.173 12.035 10.843 11.994 10.554 11.989C9.974 11.981 9.78 12.117 9.671 12.335C9.609 12.459 9.595 12.63 9.692 12.92C9.796 13.227 9.973 13.526 10.172 13.891C10.262 14.055 10.364 14.248 10.436 14.438C10.501 14.612 10.587 14.897 10.523 15.209C10.445 15.592 10.182 15.848 9.875 15.981C9.609 16.095 9.301 16.125 9 16.125C4.899 16.125 1.5 12.975 1.5 9C1.5 5.025 4.899 1.875 9 1.875C13.101 1.875 16.5 5.025 16.5 9Z" fill="currentColor"/></svg>`,
+  teater:`<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 11.245C14.404 11.317 13.917 11.588 13.55 11.979C13.184 12.368 12.925 12.895 12.813 13.5H14.25C14.664 13.5 15 13.164 15 12.75V11.245ZM7.483 4.5C7.564 6.07 7.342 7.424 6.64 8.538C6.183 9.262 5.55 9.84 4.749 10.303C5.041 10.483 5.308 10.7 5.544 10.951C6.015 11.453 6.354 12.072 6.551 12.75H11.449C11.646 12.072 11.985 11.453 12.456 10.951C12.692 10.7 12.958 10.483 13.25 10.303C12.45 9.84 11.817 9.262 11.36 8.538C10.658 7.424 10.436 6.07 10.517 4.5H7.483ZM3 12.75C3 13.164 3.336 13.5 3.75 13.5H5.188C5.075 12.895 4.816 12.368 4.45 11.979C4.083 11.588 3.596 11.317 3 11.245V12.75ZM15 5.25C15 4.836 14.664 4.5 14.25 4.5H12.019C11.935 5.932 12.142 6.965 12.629 7.737C13.074 8.443 13.811 9.022 15 9.472V5.25ZM3 9.472C4.189 9.022 4.926 8.443 5.371 7.737C5.858 6.965 6.065 5.932 5.981 4.5H3.75C3.336 4.5 3 4.836 3 5.25V9.472ZM16.5 12.75C16.5 13.993 15.493 15 14.25 15H12C11.591 15 11.258 14.673 11.25 14.264V14.25H6.75C6.75 14.255 6.75 14.259 6.75 14.264C6.743 14.673 6.409 15 6 15H3.75C2.507 15 1.5 13.993 1.5 12.75V5.25C1.5 4.007 2.507 3 3.75 3H14.25C15.493 3 16.5 4.007 16.5 5.25V12.75Z" fill="currentColor"/></svg>`,
+  samhalle:`<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><g clip-path="url(#csa)"><path d="M5.625 9C7.778 9 9.82 10.486 10.58 13.21C10.978 14.635 9.763 15.75 8.516 15.75H2.734C1.487 15.75 0.272 14.635 0.67 13.21C1.43 10.486 3.472 9 5.625 9ZM11.278 9.132C13.765 8.527 16.437 10.005 17.331 13.213C17.728 14.639 16.511 15.75 15.266 15.75H12.75C12.336 15.75 12 15.414 12 15C12 14.586 12.336 14.25 12.75 14.25H15.266C15.487 14.25 15.675 14.154 15.787 14.026C15.892 13.907 15.928 13.768 15.886 13.615C15.182 11.09 13.239 10.198 11.633 10.589C11.23 10.687 10.824 10.44 10.727 10.037C10.629 9.635 10.876 9.23 11.278 9.132ZM5.625 10.5C4.226 10.5 2.716 11.456 2.114 13.613C2.072 13.766 2.109 13.905 2.214 14.025C2.326 14.154 2.514 14.25 2.734 14.25H8.516C8.736 14.25 8.925 14.154 9.037 14.025C9.142 13.905 9.178 13.766 9.136 13.613C8.534 11.456 7.024 10.5 5.625 10.5ZM7.125 5.25C7.125 4.422 6.453 3.75 5.625 3.75C4.797 3.75 4.125 4.422 4.125 5.25C4.125 6.078 4.797 6.75 5.625 6.75C6.453 6.75 7.125 6.078 7.125 5.25ZM13.875 5.25C13.875 4.422 13.203 3.75 12.375 3.75C11.547 3.75 10.875 4.422 10.875 5.25C10.875 6.078 11.547 6.75 12.375 6.75C13.203 6.75 13.875 6.078 13.875 5.25ZM8.625 5.25C8.625 6.907 7.282 8.25 5.625 8.25C3.968 8.25 2.625 6.907 2.625 5.25C2.625 3.593 3.968 2.25 5.625 2.25C7.282 2.25 8.625 3.593 8.625 5.25ZM15.375 5.25C15.375 6.907 14.032 8.25 12.375 8.25C10.718 8.25 9.375 6.907 9.375 5.25C9.375 3.593 10.718 2.25 12.375 2.25C14.032 2.25 15.375 3.593 15.375 5.25Z" fill="currentColor"/></g><defs><clipPath id="csa"><rect width="18" height="18" fill="white"/></clipPath></defs></svg>`,
+  fritid:`<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M12.838 1.5C13.712 1.5 14.253 2.454 13.803 3.204L12.575 5.25H15.516C16.549 5.25 17.035 6.527 16.264 7.215L6.032 16.328C5.175 17.091 3.86 16.232 4.214 15.141L5.719 10.5H3.419C2.583 10.5 2.039 9.62 2.413 8.872L5.788 2.122C5.979 1.741 6.368 1.5 6.794 1.5H12.838ZM4.026 9H6.234C6.998 9 7.54 9.745 7.305 10.472L6.066 14.287L14.53 6.75H11.912C11.038 6.75 10.498 5.796 10.948 5.046L12.176 3H7.026L4.026 9Z" fill="currentColor"/></svg>`,
+  spel:`<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><g clip-path="url(#csp)"><path d="M15.75 7.5C15.75 6.257 14.743 5.25 13.5 5.25H4.5C3.257 5.25 2.25 6.257 2.25 7.5V10.5C2.25 11.743 3.257 12.75 4.5 12.75H13.5C14.743 12.75 15.75 11.743 15.75 10.5V7.5ZM5.25 10.5V9.75H4.5C4.086 9.75 3.75 9.414 3.75 9C3.75 8.586 4.086 8.25 4.5 8.25H5.25V7.5C5.25 7.086 5.586 6.75 6 6.75C6.414 6.75 6.75 7.086 6.75 7.5V8.25H7.5C7.914 8.25 8.25 8.586 8.25 9C8.25 9.414 7.914 9.75 7.5 9.75H6.75V10.5C6.75 10.914 6.414 11.25 6 11.25C5.586 11.25 5.25 10.914 5.25 10.5ZM17.25 10.5C17.25 12.571 15.571 14.25 13.5 14.25H4.5C2.429 14.25 0.75 12.571 0.75 10.5V7.5C0.75 5.429 2.429 3.75 4.5 3.75H13.5C15.571 3.75 17.25 5.429 17.25 7.5V10.5Z" fill="currentColor"/><path d="M11.063 10.5C10.855 10.5 10.688 10.332 10.688 10.125C10.688 9.918 10.855 9.75 11.063 9.75C11.27 9.75 11.438 9.918 11.438 10.125C11.438 10.332 11.27 10.5 11.063 10.5ZM13.313 8.25C13.105 8.25 12.938 8.082 12.938 7.875C12.938 7.668 13.105 7.5 13.313 7.5C13.52 7.5 13.688 7.668 13.688 7.875C13.688 8.082 13.52 8.25 13.313 8.25Z" fill="currentColor"/><path d="M12 10.125C12 10.643 11.58 11.063 11.063 11.063C10.577 11.063 10.178 10.694 10.13 10.221L10.125 10.125L10.13 10.029C10.178 9.557 10.577 9.188 11.063 9.188L11.158 9.192C11.631 9.24 12 9.64 12 10.125ZM13.313 8.813C13.83 8.813 14.25 8.393 14.25 7.875C14.25 7.39 13.881 6.99 13.408 6.942L13.313 6.938C12.827 6.938 12.428 7.306 12.38 7.779L12.375 7.875L12.38 7.971C12.428 8.444 12.827 8.813 13.313 8.813Z" fill="currentColor"/></g><defs><clipPath id="csp"><rect width="18" height="18" fill="white"/></clipPath></defs></svg>`,
+  hantverk:`<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M14.997 7.063L14.03 8.03C12.909 9.152 11.091 9.152 9.97 8.03C8.848 6.909 8.848 5.091 9.97 3.97L10.937 3.002C10.916 3.002 10.896 3 10.875 3C8.597 3 6.75 4.847 6.75 7.125C6.75 7.689 6.863 8.224 7.066 8.712C7.183 8.993 7.119 9.316 6.904 9.531L3.278 13.157C2.986 13.45 2.986 13.925 3.278 14.218L3.782 14.722C4.075 15.014 4.55 15.014 4.843 14.722L8.469 11.096L8.554 11.023C8.764 10.868 9.042 10.831 9.288 10.934C9.776 11.137 10.311 11.25 10.875 11.25C13.153 11.25 15 9.403 15 7.125C15 7.104 14.997 7.083 14.997 7.063ZM16.5 7.125C16.5 10.232 13.982 12.75 10.875 12.75C10.29 12.75 9.724 12.659 9.192 12.492L5.903 15.782C5.025 16.661 3.6 16.661 2.722 15.782L2.218 15.278C1.339 14.4 1.339 12.975 2.218 12.097L5.507 8.807C5.34 8.275 5.25 7.71 5.25 7.125C5.25 4.018 7.768 1.5 10.875 1.5C11.522 1.5 12.146 1.61 12.727 1.813C12.97 1.897 13.153 2.101 13.211 2.353C13.269 2.604 13.192 2.868 13.01 3.051L11.03 5.03C10.495 5.566 10.495 6.434 11.03 6.97C11.566 7.505 12.434 7.505 12.97 6.97L14.949 4.99L15.021 4.927C15.198 4.791 15.427 4.739 15.647 4.789C15.899 4.847 16.103 5.03 16.188 5.273C16.39 5.854 16.5 6.478 16.5 7.125Z" fill="currentColor"/></svg>`,
+  film:`<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1.5C9.478 1.5 9.946 1.655 10.329 1.942L10.353 1.96L10.354 1.961C10.427 2.015 10.51 2.056 10.6 2.08C10.69 2.104 10.786 2.11 10.879 2.098L10.914 2.093V2.094C11.389 2.033 11.873 2.126 12.29 2.362C12.707 2.599 13.037 2.965 13.223 3.407L13.236 3.438C13.27 3.517 13.319 3.59 13.382 3.652C13.446 3.715 13.524 3.766 13.609 3.801L13.639 3.813C14.084 3.993 14.458 4.313 14.702 4.727C14.909 5.078 15.011 5.48 14.998 5.885C15.206 6.179 15.31 6.55 15.26 6.94L14.287 14.536C14.143 15.659 13.187 16.5 12.055 16.5H5.945C4.813 16.5 3.857 15.659 3.713 14.536L2.74 6.94C2.69 6.55 2.794 6.178 3.003 5.884C2.99 5.479 3.091 5.078 3.298 4.727C3.543 4.313 3.917 3.993 4.362 3.813L4.391 3.802C4.477 3.767 4.553 3.717 4.617 3.654C4.681 3.592 4.731 3.518 4.764 3.438L4.776 3.409C4.963 2.967 5.292 2.6 5.71 2.363C6.127 2.127 6.611 2.033 7.087 2.095L7.123 2.1C7.215 2.111 7.309 2.106 7.398 2.082C7.487 2.059 7.57 2.018 7.642 1.964L7.67 1.943C8.053 1.655 8.52 1.5 9 1.5ZM5.201 14.346C5.249 14.72 5.568 15 5.945 15H6.72L6.403 6.75H4.227L5.201 14.346ZM11.28 15H12.055C12.432 15 12.75 14.72 12.798 14.346L13.773 6.75H11.597L11.28 15ZM8.222 15H9.778L10.095 6.75H7.905L8.222 15ZM9 3C8.843 3 8.693 3.051 8.572 3.142L8.545 3.162C8.316 3.334 8.055 3.46 7.779 3.532C7.502 3.605 7.214 3.623 6.93 3.587L6.894 3.582C6.739 3.562 6.582 3.593 6.449 3.669C6.316 3.744 6.215 3.859 6.159 3.992L6.146 4.021C6.035 4.285 5.872 4.525 5.667 4.726C5.462 4.926 5.219 5.085 4.954 5.192L4.923 5.204C4.891 5.217 4.861 5.233 4.832 5.25H13.171C13.141 5.232 13.109 5.217 13.076 5.203L13.046 5.19C12.78 5.083 12.538 4.925 12.334 4.725C12.129 4.524 11.966 4.285 11.854 4.021L11.841 3.99C11.785 3.857 11.684 3.743 11.55 3.668C11.417 3.592 11.26 3.561 11.105 3.581H11.104L11.069 3.585L11.07 3.586C10.786 3.623 10.497 3.604 10.219 3.531C9.943 3.459 9.682 3.333 9.454 3.161L9.43 3.143L9.428 3.142C9.307 3.051 9.156 3 9 3Z" fill="currentColor"/></svg>`,
+  kurs:`<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><g clip-path="url(#ck)"><path d="M15.75 4.875C15.75 4.668 15.582 4.5 15.375 4.5H11.25C10.473 4.5 9.835 5.09 9.758 5.847L9.75 6V13.929C10.285 13.632 10.876 13.5 11.458 13.5H15.375C15.582 13.5 15.75 13.332 15.75 13.125V4.875ZM2.25 13.125C2.25 13.332 2.418 13.5 2.625 13.5H6.542C7.124 13.5 7.715 13.632 8.25 13.929V6C8.25 5.172 7.578 4.5 6.75 4.5H2.625C2.418 4.5 2.25 4.668 2.25 4.875V13.125ZM17.25 13.125C17.25 14.161 16.411 15 15.375 15H11.458C11.068 15 10.707 15.094 10.407 15.279C10.092 15.474 9.837 15.753 9.671 16.085C9.544 16.339 9.284 16.5 9 16.5C8.716 16.5 8.456 16.339 8.329 16.085C8.163 15.753 7.908 15.474 7.593 15.279C7.293 15.094 6.933 15 6.542 15H2.625C1.589 15 0.75 14.161 0.75 13.125V4.875C0.75 3.839 1.589 3 2.625 3H6.75C7.647 3 8.45 3.395 9 4.02C9.55 3.395 10.353 3 11.25 3H15.375C16.411 3 17.25 3.839 17.25 4.875V13.125Z" fill="currentColor"/></g><defs><clipPath id="ck"><rect width="18" height="18" fill="white"/></clipPath></defs></svg>`,
+};
 
-let items=[], editingId=null, navFilter=null;
+let items=[], navFilter=null, adminMap=null;
 
 function loadItems(){
   const saved=localStorage.getItem('hk_admin_items');
-  items=saved?JSON.parse(saved):JSON.parse(JSON.stringify(SEED));
+  items=saved?JSON.parse(saved):[];
 }
 function saveItems(){ localStorage.setItem('hk_admin_items',JSON.stringify(items)); }
 
-// ── AUTH ─────────────────────────────────────────────────────────
+// ── AUTH ───────────────────────────────────────────────────────────────
 function doLogin(){
   const u=document.getElementById('loginUser').value.trim();
   const p=document.getElementById('loginPass').value;
   if(u==='admin'&&p==='0000'){
     document.getElementById('loginScreen').style.display='none';
     document.getElementById('app').style.display='flex';
-    loadItems(); renderAll();
+    loadItems();
+    // Load from main events.json if empty
+    if(items.length===0){
+      fetch('events.json').then(r=>r.json()).then(data=>{
+        items=data; saveItems(); renderAll();
+      }).catch(()=>renderAll());
+    } else { renderAll(); }
+    initAdminMap();
   } else {
     const err=document.getElementById('loginErr');
     err.style.display='block';
     setTimeout(()=>err.style.display='none',3000);
     document.getElementById('loginPass').value='';
-    document.getElementById('loginPass').focus();
   }
 }
 function doLogout(){
   document.getElementById('app').style.display='none';
   document.getElementById('loginScreen').style.display='flex';
-  document.getElementById('loginUser').value='';
-  document.getElementById('loginPass').value='';
 }
 
-// ── NAVIGATION ───────────────────────────────────────────────────
+// ── MAP ────────────────────────────────────────────────────────────────
+function initAdminMap(){
+  if(adminMap) return;
+  adminMap=L.map('adminMap',{center:[59.218,17.978],zoom:12,zoomControl:false,attributionControl:false});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(adminMap);
+  setTimeout(()=>adminMap.invalidateSize(),200);
+}
+
+// ── NAVIGATION ─────────────────────────────────────────────────────────
 function showPage(p){
   document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
   document.getElementById('page'+p).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
-  if(p==='list') document.getElementById('navList').classList.add('active');
-  else if(p==='form') document.getElementById('navAdd').classList.add('active');
   if(p==='list') renderAll();
+  if(adminMap) setTimeout(()=>adminMap.invalidateSize(),100);
 }
 function filterNav(cat){
-  navFilter=cat;
-  renderList();
-  showPage('list');
+  navFilter=(navFilter===cat)?null:cat;
+  renderAll();
 }
 
-// ── RENDER LIST ──────────────────────────────────────────────────
+// ── RENDER ─────────────────────────────────────────────────────────────
 function renderAll(){
-  renderStats(); renderList();
+  renderCatChips();
+  renderList();
 }
-function renderStats(){
-  const g=document.getElementById('statsGrid');
-  const total=items.length;
-  const byCat=cat=>items.filter(i=>i.cat===cat).length;
-  g.innerHTML=`
-    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Totalt inlägg</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--event)">${byCat('event')}</div><div class="stat-label"><span class="stat-dot" style="background:var(--event)"></span>Events</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--konst)">${byCat('konst')}</div><div class="stat-label"><span class="stat-dot" style="background:var(--konst)"></span>Konst</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--motes)">${byCat('motes')}</div><div class="stat-label"><span class="stat-dot" style="background:var(--motes)"></span>Mötesplats</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--musik)">${byCat('musik')}</div><div class="stat-label"><span class="stat-dot" style="background:var(--musik)"></span>Musik</div></div>`;
-  document.getElementById('navCount').textContent=total;
+
+function renderCatChips(){
+  const row=document.getElementById('catChipsRow');
+  const eventItems=items.filter(i=>i.type==='event');
+  const total=eventItems.length;
+  document.querySelector('.list-sub').textContent=total+' inlägg totalt';
+
+  row.innerHTML=CAT_ORDER.map(cat=>{
+    const count=eventItems.filter(i=>i.cat===cat).length;
+    if(count===0) return '';
+    const isActive=navFilter===cat;
+    const col=CAT_COLOR[cat], bg=CAT_BG[cat];
+    const badgeBg=col.replace(')',',0.18)').replace('rgb','rgba').replace('#','').replace(/^(..)(..)(..)$/,(_,r,g,b)=>`rgba(${parseInt(r,16)},${parseInt(g,16)},${parseInt(b,16)},.18)`);
+    // Simpler: just use CAT_BG with slightly more opacity for badge
+    const chipBg=isActive?col:bg;
+    const textCol=isActive?'#fff':col;
+    return `<button class="cat-chip-stat${isActive?' active-filter':''}" onclick="filterNav('${cat}')"
+      style="background:${chipBg};color:${textCol}">
+      ${(CAT_ICONS[cat]||'').replace('currentColor',textCol)}
+      <span class="cat-chip-stat-label">${CAT_LABEL[cat]}</span>
+      <span class="cat-chip-stat-badge" style="background:${isActive?'rgba(255,255,255,.2)':CAT_BG[cat].replace('.2)','.35)')};color:${textCol}">${count}</span>
+    </button>`;
+  }).join('');
 }
-function renderList(search=''){
-  let vis=navFilter?items.filter(i=>i.cat===navFilter):items;
-  if(search) vis=vis.filter(i=>i.name.toLowerCase().includes(search.toLowerCase())||i.loc.toLowerCase().includes(search.toLowerCase()));
-  const count=vis.length;
-  document.getElementById('listSub').textContent=navFilter?`${count} ${CAT_LABEL[navFilter]}-inlägg`:`${count} inlägg totalt`;
+
+function renderList(){
+  const eventItems=items.filter(i=>i.type==='event');
+  let vis=navFilter?eventItems.filter(i=>i.cat===navFilter):eventItems;
   const g=document.getElementById('itemsGrid');
-  if(!vis.length){g.innerHTML=`<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Inga inlägg hittades</div></div>`;return;}
-  g.innerHTML=vis.map(item=>`
-    <div class="item-card">
-      <img class="item-thumb" src="${item.img}" alt="${item.name}" onerror="this.src='https://images.unsplash.com/photo-1486325212027-8081e485255e?w=200'">
-      <div class="item-info">
-        <div class="item-name">${item.name}</div>
-        <div class="item-meta">
-          <span class="cat-badge" style="background:${CAT_BG[item.cat]};color:${CAT_COLOR[item.cat]}">${CAT_LABEL[item.cat]}</span>
-          ${item.free?'<span class="free-badge">Gratis</span>':''}
-          <span class="area-badge">${AREA_LABEL[item.area]||item.area||'—'}</span>
-          <span class="area-badge">${item.date||'—'}</span>
+  if(!vis.length){g.innerHTML=`<div class="empty">Inga inlägg hittades</div>`;return;}
+  g.innerHTML=vis.map(item=>{
+    const col=CAT_COLOR[item.cat]||'#666', bg=CAT_BG[item.cat]||'rgba(0,0,0,.1)';
+    const priceBadge=item.free
+      ?`<span class="item-price-badge" style="background:rgba(52,199,89,.12);color:#1a7a38">Gratis</span>`
+      :'';
+    return `<div class="item-row">
+      <div class="item-row-left">
+        <img class="item-thumb" src="${item.img||''}" alt="${item.name}" onerror="this.style.background='#e8e8e8';this.removeAttribute('src')">
+        <div class="item-info">
+          <div class="item-name-row">
+            <span class="item-name">${item.name}</span>
+            <div class="item-badges">
+              <span class="item-cat-badge" style="background:${bg};color:${col}">${CAT_LABEL[item.cat]||item.cat}</span>
+              ${priceBadge}
+            </div>
+          </div>
+          <div class="item-desc">${item.desc||''}</div>
         </div>
-        <div class="item-desc">${item.desc}</div>
       </div>
       <div class="item-actions">
         <button class="edit-btn" onclick="editItem(${item.id})">Redigera</button>
-        <button class="btn-danger" onclick="confirmDelete(${item.id})">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 3h12M5 3V1h4v2M11 3l-1 9H4L3 3"/></svg>
+        <button class="del-btn" onclick="confirmDelete(${item.id})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+          Radera
         </button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
-// ── FORM ─────────────────────────────────────────────────────────
+// ── FORM ───────────────────────────────────────────────────────────────
+let editingId=null;
 function newItem(){
   editingId=null;
   document.getElementById('formTitle').textContent='Nytt inlägg';
-  clearForm();
-  showPage('form');
+  clearForm(); showPage('form');
 }
 function editItem(id){
-  editingId=id;
-  clearForm();
-  const item=items.find(x=>x.id===id);
+  editingId=id; clearForm();
+  const item=items.find(x=>x.id===id); if(!item) return;
   document.getElementById('formTitle').textContent='Redigera: '+item.name;
   document.getElementById('fName').value=item.name||'';
   document.getElementById('fDesc').value=item.desc||'';
   document.getElementById('fLongDesc').value=item.longDesc||'';
-  // Date: try to parse, else mark as recurring
   const recurring=['Löpande','Permanent','löpande','permanent'].some(s=>item.date?.includes(s));
-  if(recurring){
-    document.getElementById('fRecurring').checked=true;
-    document.getElementById('fDate').disabled=true;
-  } else if(item.date){
-    // Try to parse "12 Jun" style → convert to YYYY-MM-DD for date input
+  if(recurring){ document.getElementById('fRecurring').checked=true; document.getElementById('fDate').disabled=true; }
+  else if(item.date){
     try{
       const months={Jan:0,Feb:1,Mar:2,Apr:3,Maj:4,Jun:5,Jul:6,Aug:7,Sep:8,Okt:9,Nov:10,Dec:11};
       const parts=item.date.split(/[\s–]/);
       if(parts.length>=2&&months[parts[1]]!==undefined){
-        const y=new Date().getFullYear();
-        const d=new Date(y,months[parts[1]],parseInt(parts[0]));
+        const d=new Date(new Date().getFullYear(),months[parts[1]],parseInt(parts[0]));
         document.getElementById('fDate').value=d.toISOString().slice(0,10);
       }
     }catch(e){}
   }
-  // Time: parse "12:00–14:00" style
-  if(item.time){
-    const tp=item.time.split('–');
-    document.getElementById('fTimeStart').value=tp[0]?.trim()||'';
-    document.getElementById('fTimeEnd').value=tp[1]?.trim()||'';
-  }
-  // Address
+  if(item.time){const tp=item.time.split('–');document.getElementById('fTimeStart').value=tp[0]?.trim()||'';document.getElementById('fTimeEnd').value=tp[1]?.trim()||'';}
   document.getElementById('fLoc').value=item.loc||'';
   document.getElementById('fAddr').value=item.addr||'';
   document.getElementById('fLat').value=item.lat||'';
   document.getElementById('fLng').value=item.lng||'';
-  if(item.loc){
-    addrSelected=true;
-    document.getElementById('addrSelectedText').textContent=item.loc;
-    document.getElementById('addrSelected').style.display='flex';
-    document.getElementById('addrCoords').textContent=item.lat&&item.lng?`📍 ${item.lat}, ${item.lng}`:'';
-  }
+  if(item.loc){addrSelected=true;document.getElementById('addrSelectedText').textContent=item.loc;document.getElementById('addrSelected').style.display='flex';document.getElementById('addrCoords').textContent=item.lat&&item.lng?`📍 ${item.lat}, ${item.lng}`:''}
   document.getElementById('fArea').value=item.area||'';
   document.getElementById('fHost').value=item.host||'';
   document.getElementById('fUrl').value=item.url||'';
   document.getElementById('fFree').checked=item.free||false;
   document.getElementById('fCat').value=item.cat||'';
   selectCatForm(item.cat,false);
-  // Image
   if(item.img) setImage(item.img);
-  updatePreview();
   showPage('form');
 }
 function clearForm(){
   ['fName','fDesc','fLongDesc','fUrl','fImg','fLat','fLng','fLoc','fAddr'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('fDate').value='';
-  document.getElementById('fDate').disabled=false;
-  document.getElementById('fTimeStart').value='';
-  document.getElementById('fTimeEnd').value='';
+  document.getElementById('fDate').value=''; document.getElementById('fDate').disabled=false;
+  document.getElementById('fTimeStart').value=''; document.getElementById('fTimeEnd').value='';
   document.getElementById('fRecurring').checked=false;
-  document.getElementById('fArea').value='';
-  document.getElementById('fHost').value='';
-  document.getElementById('fCat').value='';
-  document.getElementById('fFree').checked=false;
+  document.getElementById('fArea').value=''; document.getElementById('fHost').value='';
+  document.getElementById('fCat').value=''; document.getElementById('fFree').checked=false;
   document.querySelectorAll('.cat-pill').forEach(p=>{p.className='cat-pill';});
   clearAddr(); clearImage();
-  document.getElementById('fImgUrl').value='';
-  updatePreview();
+  if(document.getElementById('fImgUrl')) document.getElementById('fImgUrl').value='';
 }
-function selectCatForm(cat, update=true){
+function selectCatForm(cat,update=true){
   document.getElementById('fCat').value=cat;
-  document.querySelectorAll('.cat-pill').forEach(p=>{
-    p.className='cat-pill'+(p.dataset.cat===cat?' on-'+cat:'');
-  });
-  if(update) updatePreview();
+  document.querySelectorAll('.cat-pill').forEach(p=>{p.className='cat-pill'+(p.dataset.cat===cat?' on-'+cat:'');});
 }
 function saveItem(){
   const name=document.getElementById('fName').value.trim();
@@ -850,29 +713,29 @@ function saveItem(){
   if(!name){toast('⚠️ Fyll i ett namn');return;}
   if(!cat){toast('⚠️ Välj en kategori');return;}
   const item={
-    id: editingId || (Math.max(0,...items.map(i=>i.id))+1),
-    cat, name,
-    desc: document.getElementById('fDesc').value.trim(),
-    longDesc: document.getElementById('fLongDesc').value.trim(),
-    date: getDateDisplay(),
-    time: getTimeDisplay(),
-    loc: document.getElementById('fLoc').value.trim(),
-    addr: document.getElementById('fAddr').value.trim(),
-    area: document.getElementById('fArea').value,
-    host: document.getElementById('fHost').value,
-    free: document.getElementById('fFree').checked,
-    url: document.getElementById('fUrl').value.trim(),
-    img: document.getElementById('fImg').value.trim(),
-    lat: parseFloat(document.getElementById('fLat').value)||59.218,
-    lng: parseFloat(document.getElementById('fLng').value)||17.978,
+    id:editingId||(Math.max(0,...items.map(i=>i.id))+1),
+    type:'event', cat, name,
+    desc:document.getElementById('fDesc').value.trim(),
+    longDesc:document.getElementById('fLongDesc').value.trim(),
+    date:getDateDisplay(),
+    time:getTimeDisplay(),
+    loc:document.getElementById('fLoc').value.trim(),
+    addr:document.getElementById('fAddr').value.trim(),
+    area:document.getElementById('fArea').value,
+    host:document.getElementById('fHost').value,
+    free:document.getElementById('fFree').checked,
+    url:document.getElementById('fUrl').value.trim(),
+    img:document.getElementById('fImg').value.trim(),
+    lat:parseFloat(document.getElementById('fLat').value)||59.218,
+    lng:parseFloat(document.getElementById('fLng').value)||17.978,
   };
-  if(editingId){ const idx=items.findIndex(x=>x.id===editingId); items[idx]=item; }
+  if(editingId){const idx=items.findIndex(x=>x.id===editingId);items[idx]=item;}
   else items.push(item);
   saveItems(); renderAll(); showPage('list');
-  toast(editingId?'✓ Inlägg uppdaterat':'✓ Inlägg sparat');
+  toast(editingId?'✓ Uppdaterat':'✓ Sparat');
 }
 
-// ── DELETE ────────────────────────────────────────────────────────
+// ── DELETE ─────────────────────────────────────────────────────────────
 let deleteId=null;
 function confirmDelete(id){
   deleteId=id;
@@ -882,49 +745,45 @@ function confirmDelete(id){
   document.getElementById('confirmOk').onclick=()=>{
     items=items.filter(x=>x.id!==deleteId);
     saveItems(); renderAll(); closeConfirm();
-    toast('🗑 Inlägg borttaget');
+    toast('🗑 Borttaget');
   };
 }
-function closeConfirm(){ document.getElementById('confirmOverlay').classList.remove('show'); }
+function closeConfirm(){document.getElementById('confirmOverlay').classList.remove('show');}
 
-// ── DATE / TIME ──────────────────────────────────────────────────
+// ── DATE/TIME ──────────────────────────────────────────────────────────
 function toggleRecurring(){
   const r=document.getElementById('fRecurring').checked;
   document.getElementById('fDate').disabled=r;
   document.getElementById('timeField').style.opacity=r?.4:1;
-  updatePreview();
 }
 function getDateDisplay(){
-  const r=document.getElementById('fRecurring').checked;
-  if(r) return 'Löpande';
-  const v=document.getElementById('fDate').value;
-  if(!v) return '';
+  if(document.getElementById('fRecurring').checked) return 'Löpande';
+  const v=document.getElementById('fDate').value; if(!v) return '';
   const d=new Date(v+'T00:00:00');
   return d.toLocaleDateString('sv-SE',{day:'numeric',month:'short'});
 }
 function getTimeDisplay(){
   const s=document.getElementById('fTimeStart').value;
   const e=document.getElementById('fTimeEnd').value;
-  if(!s) return '';
-  return e?`${s}–${e}`:s;
+  if(!s) return ''; return e?`${s}–${e}`:s;
 }
 
-// ── ADDRESS SEARCH (Nominatim) ────────────────────────────────────
+// ── ADDRESS ────────────────────────────────────────────────────────────
 let addrDebounce=null, addrSelected=false;
 function onAddrInput(){
   if(addrSelected) return;
   clearTimeout(addrDebounce);
   const q=document.getElementById('fAddrSearch').value.trim();
-  if(q.length<3){ hideAddrDropdown(); return; }
+  if(q.length<3){hideAddrDropdown();return;}
   addrDebounce=setTimeout(()=>searchAddr(q),400);
 }
 async function searchAddr(q){
   document.getElementById('addrSpinner').style.display='block';
   try{
-    const r=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q+', Huddinge')}&format=json&limit=6&viewbox=17.73,59.08,18.24,59.34&bounded=0&accept-language=sv&countrycodes=se`,{headers:{'Accept-Language':'sv'}});
+    const r=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q+', Huddinge')}&format=json&limit=6&accept-language=sv&countrycodes=se`,{headers:{'Accept-Language':'sv'}});
     const data=await r.json();
     showAddrResults(data);
-  }catch(e){ hideAddrDropdown(); }
+  }catch(e){hideAddrDropdown();}
   document.getElementById('addrSpinner').style.display='none';
 }
 function showAddrResults(results){
@@ -934,20 +793,14 @@ function showAddrResults(results){
     const parts=r.display_name.split(', ');
     const name=parts[0]+(parts[1]&&parts[1]!==parts[0]?', '+parts[1]:'');
     const sub=parts.slice(2,5).join(', ');
-    return `<div class="addr-result" onclick="selectAddr(${i},'${escJ(r.display_name)}',${r.lat},${r.lon})">
-      <div class="addr-result-name">${name}</div>
-      <div class="addr-result-sub">${sub}</div>
-    </div>`;
+    return `<div class="addr-result" onclick="selectAddr(${i},'${escJ(r.display_name)}',${r.lat},${r.lon})"><div class="addr-result-name">${name}</div><div class="addr-result-sub">${sub}</div></div>`;
   }).join('');
-  dd._data=results;
-  dd.style.display='block';
+  dd._data=results; dd.style.display='block';
 }
 function escJ(s){return s.replace(/'/g,"\\'").replace(/\n/g,'')}
 function selectAddr(i,full,lat,lon){
   const dd=document.getElementById('addrDropdown');
-  const r=dd._data?dd._data[i]:null;
-  hideAddrDropdown();
-  addrSelected=true;
+  hideAddrDropdown(); addrSelected=true;
   const parts=full.split(', ');
   const displayName=parts[0]+(parts[1]&&parts[1]!==parts[0]?', '+parts[1]:'');
   document.getElementById('fAddrSearch').value='';
@@ -958,29 +811,23 @@ function selectAddr(i,full,lat,lon){
   document.getElementById('addrSelectedText').textContent=displayName;
   document.getElementById('addrSelected').style.display='flex';
   document.getElementById('addrCoords').textContent=`📍 ${parseFloat(lat).toFixed(4)}, ${parseFloat(lon).toFixed(4)}`;
-  // Auto-suggest area
   const lc=full.toLowerCase();
-  const areaMap={flemingsberg:'flemingsberg',huddinge:'huddinge',skogås:'skogas','skogas':'skogas',sjödalen:'sjodalen',sjodalen:'sjodalen',glömsta:'glomsta',glomsta:'glomsta',vistaberg:'vistaberg',lida:'lida'};
-  for(const [k,v] of Object.entries(areaMap)){ if(lc.includes(k)){ document.getElementById('fArea').value=v; break; } }
-  updatePreview();
+  const areaMap={flemingsberg:'flemingsberg',huddinge:'huddinge',skogås:'skogas',sjödalen:'sjodalen',glömsta:'glomsta',vistaberg:'vistaberg',lida:'lida'};
+  for(const [k,v] of Object.entries(areaMap)){if(lc.includes(k)){document.getElementById('fArea').value=v;break;}}
 }
 function clearAddr(){
   addrSelected=false;
   document.getElementById('addrSelected').style.display='none';
   document.getElementById('addrCoords').textContent='';
-  document.getElementById('fLoc').value='';
-  document.getElementById('fAddr').value='';
-  document.getElementById('fLat').value='';
-  document.getElementById('fLng').value='';
-  document.getElementById('fAddrSearch').value='';
-  updatePreview();
+  ['fLoc','fAddr','fLat','fLng','fAddrSearch'].forEach(id=>document.getElementById(id).value='');
+  hideAddrDropdown();
 }
-function hideAddrDropdown(){ document.getElementById('addrDropdown').style.display='none'; }
+function hideAddrDropdown(){document.getElementById('addrDropdown').style.display='none';}
 document.addEventListener('click',e=>{
   if(!document.getElementById('addrDropdown').contains(e.target)&&e.target.id!=='fAddrSearch') hideAddrDropdown();
 });
 
-// ── IMAGE UPLOAD ─────────────────────────────────────────────────
+// ── IMAGE ──────────────────────────────────────────────────────────────
 function handleFileSelect(e){
   const file=e.target.files[0]; if(!file||!file.type.startsWith('image/')) return;
   const reader=new FileReader();
@@ -990,62 +837,36 @@ function handleFileSelect(e){
 function loadImgFromUrl(){
   const url=document.getElementById('fImgUrl').value.trim();
   if(!url) return;
-  setImage(url);
-  document.getElementById('fImgUrl').value='';
+  setImage(url); document.getElementById('fImgUrl').value='';
 }
 function setImage(src){
   document.getElementById('fImg').value=src;
   document.getElementById('imgPreviewEl').src=src;
   document.getElementById('imgPreviewArea').style.display='block';
   document.getElementById('uploadZone').style.display='none';
-  document.getElementById('pvImg').src=src;
 }
 function clearImage(){
   document.getElementById('fImg').value='';
   document.getElementById('imgPreviewArea').style.display='none';
   document.getElementById('uploadZone').style.display='block';
-  document.getElementById('pvImg').src='';
   document.getElementById('fileInput').value='';
 }
-// Drag & drop
 document.addEventListener('DOMContentLoaded',()=>{
-  const zone=document.getElementById('uploadZone');
-  if(!zone) return;
+  const zone=document.getElementById('uploadZone'); if(!zone) return;
   zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over')});
   zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
   zone.addEventListener('drop',e=>{
-    e.preventDefault(); zone.classList.remove('drag-over');
+    e.preventDefault();zone.classList.remove('drag-over');
     const file=e.dataTransfer.files[0];
-    if(file&&file.type.startsWith('image/')){
-      const r=new FileReader(); r.onload=ev=>setImage(ev.target.result); r.readAsDataURL(file);
-    }
+    if(file&&file.type.startsWith('image/')){const r=new FileReader();r.onload=ev=>setImage(ev.target.result);r.readAsDataURL(file);}
   });
 });
-function updatePreview(){
-  const cat=document.getElementById('fCat').value;
-  const name=document.getElementById('fName').value||'Namn på inlägg';
-  const desc=document.getElementById('fDesc').value||'Kort beskrivning visas här';
-  const date=getDateDisplay()||'Datum';
-  const loc=document.getElementById('fLoc').value||'Plats';
-  const time=getTimeDisplay()||'Tid';
-  const pv=document.getElementById('pvCat');
-  if(cat){ pv.style.background=CAT_BG[cat]; pv.style.color=CAT_COLOR[cat]; pv.textContent=CAT_LABEL[cat]; }
-  else { pv.style.background='rgba(0,0,0,.08)'; pv.style.color='rgba(0,0,0,.4)'; pv.textContent='Kategori'; }
-  document.getElementById('pvName').textContent=name;
-  document.getElementById('pvName').style.color=name==='Namn på inlägg'?'rgba(0,0,0,.3)':'#000';
-  document.getElementById('pvDesc').textContent=desc;
-  document.getElementById('pvDate').textContent=date;
-  document.getElementById('pvLoc').textContent=loc;
-  document.getElementById('pvTime').textContent=time;
-}
 
-// ── TOAST ─────────────────────────────────────────────────────────
-function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
+// ── TOAST ──────────────────────────────────────────────────────────────
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
-// ── LIVE PREVIEW on input ─────────────────────────────────────────
-['fName','fDesc'].forEach(id=>{
-  document.getElementById(id)?.addEventListener('input',updatePreview);
-});
+// ── PREVIEW (no-op, kept for compatibility) ────────────────────────────
+function updatePreview(){}
 </script>
 </body>
 </html>
